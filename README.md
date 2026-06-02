@@ -79,10 +79,33 @@ src/
 ## Comandos
 
 ```bash
-npm run dev      # Dev server
-npm run build    # Build production
-npm run lint     # ESLint
+npm run dev         # Dev server
+npm run build       # Build production
+npm run lint        # ESLint
+npm run test        # Tests (Vitest)
+npm run test:watch  # Tests en watch mode
 ```
+
+## Tests
+
+**Framework:** Vitest + React Testing Library + jsdom
+
+### Qué cubren
+| Archivo | Tests | Lo que detectan |
+|---|---|---|
+| `utils.test.ts` | 8 | `cn()` filtra falsy, `formatCurrency()` formato ARS, `getProgressColor()` boundaries semánticos |
+| `ProgressBar.test.tsx` | 7 | Ancho, clamping 0-100%, colores semánticos por rango, className |
+| `Avatar.test.tsx` | 3 | Iniciales correctas (J/L), tamaño custom |
+| `Card.test.tsx` | 3 | Render children, skeleton loading, hover state |
+| `StatusPill.test.tsx` | 4 | Variantes positive/alerta/critico con colores correctos |
+| `Button.test.tsx` | 6 | Click, disabled, loading spinner, no click cuando disabled |
+| `AlertBanner.test.tsx` | 3 | Render message, action button, sin action si no hay label |
+
+### Reglas
+- Test por componente en `src/components/ui/__tests__/`. Tests de utilidades en `src/lib/__tests__/`.
+- No usar `toHaveStyle()` con valores de unidad — jsdom no computa inline styles con unidades correctamente. Usar `.style.width` directamente.
+- jsdom devuelve colores en formato `rgb()`. Usar `rgb(0, 200, 150)` en vez de `#00C896`.
+- Antes de commitear: `npm run test && npm run lint && npm run build`
 
 ## Convenciones
 

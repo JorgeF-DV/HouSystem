@@ -34,6 +34,6 @@ export function formatTimeAgo(date: Date): string {
 
 export function getProgressColor(percent: number): string {
   if (percent >= 90) return "#FF5B5B";
-  if (percent >= 70) return "#F5A623";
+  if (percent > 70) return "#F5A623";
   return "#00C896";
 }
