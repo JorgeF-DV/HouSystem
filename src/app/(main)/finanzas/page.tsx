@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -28,9 +28,33 @@ const monthNames = [
 ];
 
 export default function FinanzasPage() {
+  useEffect(() => { document.title = "Finanzas — HouSystem"; }, []);
   const [monthIndex, setMonthIndex] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [gastoMonto, setGastoMonto] = useState("");
+  const [gastoDesc, setGastoDesc] = useState("");
+  const [gastoCat, setGastoCat] = useState("");
+  const [gastoWho, setGastoWho] = useState("");
+  const [gastoErrors, setGastoErrors] = useState<{ monto?: string; categoria?: string; quien?: string }>({});
+
+  const validateGasto = () => {
+    const errs: typeof gastoErrors = {};
+    if (!gastoMonto || Number(gastoMonto) <= 0) errs.monto = "El monto debe ser mayor a 0";
+    if (!gastoCat) errs.categoria = "Seleccioná una categoría";
+    if (!gastoWho) errs.quien = "Seleccioná quién pagó";
+    setGastoErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const resetGasto = () => {
+    setGastoMonto("");
+    setGastoDesc("");
+    setGastoCat("");
+    setGastoWho("");
+    setGastoErrors({});
+    setSheetOpen(false);
+  };
 
   const current = monthIndex === new Date().getMonth();
   const monthName = monthNames[monthIndex];
@@ -38,7 +62,7 @@ export default function FinanzasPage() {
   const prevMonth = () => {
     if (monthIndex === 0) {
       setMonthIndex(11);
-      setYear(year - 1);
+      setYear((y) => y - 1);
     } else {
       setMonthIndex(monthIndex - 1);
     }
@@ -47,7 +71,7 @@ export default function FinanzasPage() {
   const nextMonth = () => {
     if (monthIndex === 11) {
       setMonthIndex(0);
-      setYear(year + 1);
+      setYear((y) => y + 1);
     } else {
       setMonthIndex(monthIndex + 1);
     }
@@ -63,7 +87,7 @@ export default function FinanzasPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-syne text-[28px] font-medium text-text-primary">Finanzas</h1>
         <div className="flex items-center gap-3">
-          <button onClick={prevMonth} className="p-2 hover:bg-surface-1 rounded-btn transition-colors">
+          <button onClick={prevMonth} aria-label="Mes anterior" className="p-2 hover:bg-surface-1 rounded-btn transition-colors">
             <IconChevronLeft size={18} className="text-text-secondary" />
           </button>
           <span className="font-dm-sans text-[15px] text-text-secondary min-w-[100px] text-center">
@@ -71,6 +95,7 @@ export default function FinanzasPage() {
           </span>
           <button
             onClick={nextMonth}
+            aria-label="Mes siguiente"
             className="p-2 hover:bg-surface-1 rounded-btn transition-colors"
           >
             <IconChevronRight size={18} className="text-text-secondary" />
@@ -79,7 +104,7 @@ export default function FinanzasPage() {
       </div>
 
       {/* Alert */}
-      <AlertBanner variant="warning" className="mb-6" actionLabel="Revisar" onAction={() => {}}>
+      <AlertBanner variant="warning" className="mb-6">
         Salidas está al 90% del presupuesto
       </AlertBanner>
 
@@ -196,17 +221,18 @@ export default function FinanzasPage() {
       {current && (
         <button
           onClick={() => setSheetOpen(true)}
+          aria-label="Agregar gasto"
           className="fixed bottom-20 md:bottom-8 right-6 z-20 w-14 h-14 rounded-full bg-green text-black flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity"
         >
-          <IconPlus size={24} />
+          <IconPlus size={24} aria-hidden="true" />
         </button>
       )}
 
       {/* Bottom Sheet */}
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Nuevo gasto">
+      <BottomSheet open={sheetOpen} onClose={() => { resetGasto(); }} title="Nuevo gasto">
         <div className="flex flex-col gap-4 py-4">
-          <Input label="Monto" type="number" placeholder="$0" />
-          <Input label="Descripción" placeholder="¿En qué gastaron?" />
+          <Input label="Monto" type="number" placeholder="$0" value={gastoMonto} onChange={(e) => { setGastoMonto(e.target.value); setGastoErrors({}); }} error={gastoErrors.monto} />
+          <Input label="Descripción" placeholder="¿En qué gastaron?" value={gastoDesc} onChange={(e) => setGastoDesc(e.target.value)} />
           <div>
             <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">
               Categoría
@@ -215,27 +241,48 @@ export default function FinanzasPage() {
               {categories.map((cat) => (
                 <button
                   key={cat.name}
-                  className="whitespace-nowrap px-4 py-2 rounded-pill bg-surface-2 text-text-secondary text-[13px] font-dm-sans hover:bg-surface-3 transition-colors"
+                  onClick={() => { setGastoCat(cat.name); setGastoErrors({}); }}
+                  className={`whitespace-nowrap px-4 py-2 rounded-pill text-[13px] font-dm-sans transition-colors ${
+                    gastoCat === cat.name
+                      ? "bg-green text-black"
+                      : "bg-surface-2 text-text-secondary hover:bg-surface-3"
+                  }`}
                 >
                   {cat.icon} {cat.name}
                 </button>
               ))}
             </div>
+            {gastoErrors.categoria && <span className="text-coral text-[12px] font-dm-sans">{gastoErrors.categoria}</span>}
           </div>
           <div>
             <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">
               ¿Quién pagó?
             </label>
             <div className="flex gap-3">
-              <button className="flex-1 py-3 rounded-btn border border-surface-2 text-text-secondary text-[13px] font-dm-sans hover:bg-surface-1 transition-colors">
+              <button
+                onClick={() => { setGastoWho("jorge"); setGastoErrors({}); }}
+                className={`flex-1 py-3 rounded-btn border text-[13px] font-dm-sans transition-colors ${
+                  gastoWho === "jorge"
+                    ? "border-jorge text-jorge bg-jorge/10"
+                    : "border-surface-2 text-text-secondary"
+                }`}
+              >
                 Jorge
               </button>
-              <button className="flex-1 py-3 rounded-btn border border-surface-2 text-text-secondary text-[13px] font-dm-sans hover:bg-surface-1 transition-colors">
+              <button
+                onClick={() => { setGastoWho("lorena"); setGastoErrors({}); }}
+                className={`flex-1 py-3 rounded-btn border text-[13px] font-dm-sans transition-colors ${
+                  gastoWho === "lorena"
+                    ? "border-lorena text-lorena bg-lorena/10"
+                    : "border-surface-2 text-text-secondary"
+                }`}
+              >
                 Lorena
               </button>
             </div>
+            {gastoErrors.quien && <span className="text-coral text-[12px] font-dm-sans">{gastoErrors.quien}</span>}
           </div>
-          <Button className="w-full mt-2">Guardar</Button>
+          <Button className="w-full mt-2" onClick={() => { if (validateGasto()) { resetGasto(); } }}>Guardar</Button>
         </div>
       </BottomSheet>
     </div>

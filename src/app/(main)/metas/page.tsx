@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -25,6 +26,7 @@ const goals = [
 ];
 
 export default function MetasPage() {
+  useEffect(() => { document.title = "Metas — HouSystem"; }, []);
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10 md:px-6 pb-24 md:pb-10">
       {/* Header */}
@@ -32,9 +34,10 @@ export default function MetasPage() {
         <h1 className="font-syne text-[28px] font-medium text-text-primary">Metas</h1>
         <Link
           href="/metas/agregar"
+          aria-label="Agregar meta"
           className="p-2 hover:bg-surface-1 rounded-btn transition-colors"
         >
-          <IconPlus size={20} className="text-text-secondary" />
+          <IconPlus size={20} className="text-text-secondary" aria-hidden="true" />
         </Link>
       </div>
 

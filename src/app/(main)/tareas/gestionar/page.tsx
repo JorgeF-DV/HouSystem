@@ -1,60 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Input } from "@/components/ui/Input";
 import { IconArrowLeft, IconEdit, IconTrash } from "@tabler/icons-react";
 
+let nextId = 1;
 const initialTasks = [
-  { name: "Limpiar el baño", duration: "30 min", frequency: "semanal" },
-  { name: "Ordenar el living", duration: "20 min", frequency: "semanal" },
-  { name: "Sacar la basura", duration: "5 min", frequency: "semanal" },
-  { name: "Pasar la aspiradora", duration: "25 min", frequency: "semanal" },
-  { name: "Limpiar cocina", duration: "30 min", frequency: "semanal" },
-  { name: "Lavar los platos", duration: "15 min", frequency: "semanal" },
-  { name: "Regar las plantas", duration: "10 min", frequency: "semanal" },
+  { id: nextId++, name: "Limpiar el baño", duration: "30 min", frequency: "semanal" },
+  { id: nextId++, name: "Ordenar el living", duration: "20 min", frequency: "semanal" },
+  { id: nextId++, name: "Sacar la basura", duration: "5 min", frequency: "semanal" },
+  { id: nextId++, name: "Pasar la aspiradora", duration: "25 min", frequency: "semanal" },
+  { id: nextId++, name: "Limpiar cocina", duration: "30 min", frequency: "semanal" },
+  { id: nextId++, name: "Lavar los platos", duration: "15 min", frequency: "semanal" },
+  { id: nextId++, name: "Regar las plantas", duration: "10 min", frequency: "semanal" },
 ];
 
 export default function GestionarTareasPage() {
+  useEffect(() => { document.title = "Gestionar tareas — HouSystem"; }, []);
   const [tasks, setTasks] = useState(initialTasks);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [name, setName] = useState("");
   const [duration, setDuration] = useState("");
   const [frequency, setFrequency] = useState("semanal");
+  const [errors, setErrors] = useState<{ name?: string; duration?: string }>({});
+
+  const validate = () => {
+    const errs: typeof errors = {};
+    if (!name.trim()) errs.name = "El nombre es obligatorio";
+    if (!duration.trim()) errs.duration = "La duración es obligatoria";
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   const openNew = () => {
-    setEditingIndex(null);
+    setEditingId(null);
     setName("");
     setDuration("");
     setFrequency("semanal");
     setSheetOpen(true);
   };
 
-  const openEdit = (index: number) => {
-    setEditingIndex(index);
-    setName(tasks[index].name);
-    setDuration(tasks[index].duration);
-    setFrequency(tasks[index].frequency);
+  const openEdit = (id: number) => {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+    setEditingId(id);
+    setName(task.name);
+    setDuration(task.duration);
+    setFrequency(task.frequency);
     setSheetOpen(true);
   };
 
   const handleSave = () => {
-    if (!name.trim()) return;
-    if (editingIndex !== null) {
-      const updated = [...tasks];
-      updated[editingIndex] = { name, duration, frequency };
-      setTasks(updated);
+    if (!validate()) return;
+    if (editingId !== null) {
+      setTasks(tasks.map((t) =>
+        t.id === editingId ? { ...t, name, duration, frequency } : t
+      ));
     } else {
-      setTasks([...tasks, { name, duration, frequency }]);
+      setTasks([...tasks, { id: nextId++, name, duration, frequency }]);
     }
     setSheetOpen(false);
   };
 
-  const handleDelete = (index: number) => {
-    setTasks(tasks.filter((_, i) => i !== index));
+  const handleDelete = (id: number) => {
+    setTasks(tasks.filter((t) => t.id !== id));
   };
 
   return (
@@ -69,9 +82,9 @@ export default function GestionarTareasPage() {
 
       {/* List */}
       <div className="flex flex-col gap-2 mb-6">
-        {tasks.map((task, i) => (
+        {tasks.map((task) => (
           <div
-            key={i}
+            key={task.id}
             className="flex items-center gap-3 py-3 px-4 rounded-btn bg-surface-1 border border-surface-2"
           >
             <div className="flex-1 min-w-0">
@@ -81,16 +94,18 @@ export default function GestionarTareasPage() {
               </p>
             </div>
             <button
-              onClick={() => openEdit(i)}
+              onClick={() => openEdit(task.id)}
+              aria-label={`Editar ${task.name}`}
               className="p-2 hover:bg-surface-2 rounded-btn transition-colors"
             >
-              <IconEdit size={16} className="text-text-tertiary" />
+              <IconEdit size={16} className="text-text-tertiary" aria-hidden="true" />
             </button>
             <button
-              onClick={() => handleDelete(i)}
+              onClick={() => handleDelete(task.id)}
+              aria-label={`Eliminar ${task.name}`}
               className="p-2 hover:bg-surface-2 rounded-btn transition-colors"
             >
-              <IconTrash size={16} className="text-coral" />
+              <IconTrash size={16} className="text-coral" aria-hidden="true" />
             </button>
           </div>
         ))}
@@ -103,11 +118,11 @@ export default function GestionarTareasPage() {
       <BottomSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        title={editingIndex !== null ? "Editar tarea" : "Nueva tarea"}
+        title={editingId !== null ? "Editar tarea" : "Nueva tarea"}
       >
         <div className="flex flex-col gap-4 py-4">
-          <Input label="Nombre" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre de la tarea" />
-          <Input label="Duración estimada" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="30 min" />
+          <Input label="Nombre" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre de la tarea" error={errors.name} />
+          <Input label="Duración estimada" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="30 min" error={errors.duration} />
           <div>
             <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">
               Frecuencia
@@ -117,6 +132,7 @@ export default function GestionarTareasPage() {
                 <button
                   key={f}
                   onClick={() => setFrequency(f)}
+                  aria-pressed={frequency === f}
                   className={`flex-1 py-3 rounded-btn border text-[13px] font-dm-sans transition-colors ${
                     frequency === f
                       ? "border-green text-green bg-green/10"
@@ -129,7 +145,7 @@ export default function GestionarTareasPage() {
             </div>
           </div>
           <Button className="w-full mt-2" onClick={handleSave}>
-            {editingIndex !== null ? "Guardar cambios" : "Agregar tarea"}
+            {editingId !== null ? "Guardar cambios" : "Agregar tarea"}
           </Button>
         </div>
       </BottomSheet>

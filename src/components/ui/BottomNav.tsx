@@ -32,6 +32,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={active ? "page" : undefined}
               className="flex flex-col items-center justify-center gap-0.5 min-w-[44px] min-h-[44px]"
             >
               <Icon
@@ -41,6 +42,7 @@ export function BottomNav() {
                   active ? "text-green" : "text-text-tertiary"
                 )}
                 stroke={active ? 2 : 1.5}
+                aria-hidden="true"
               />
               <span
                 className={cn(

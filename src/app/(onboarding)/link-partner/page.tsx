@@ -1,51 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { IconUsers } from "@tabler/icons-react";
 
 export default function LinkPartnerPage() {
-  const router = useRouter();
+  useEffect(() => { document.title = "Vincular pareja — HouSystem"; }, []);
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [invitationReceived] = useState(false);
+  const [error, setError] = useState("");
+
+  const validate = () => {
+    if (!email.trim()) { setError("El email es obligatorio"); return false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Email inválido"); return false; }
+    setError("");
+    return true;
+  };
 
   const handleSendInvite = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setSent(true);
     }, 1000);
   };
-
-  const handleAccept = () => {
-    router.push("/dashboard");
-  };
-
-  if (invitationReceived) {
-    return (
-      <div className="flex flex-col items-center text-center gap-6">
-        <div className="w-20 h-20 rounded-full bg-green/10 flex items-center justify-center">
-          <IconUsers size={40} className="text-green" />
-        </div>
-        <div>
-          <h1 className="font-syne text-[28px] font-bold text-text-primary mb-2">
-            ¡Invitación recibida!
-          </h1>
-          <p className="font-dm-sans text-[15px] text-text-tertiary">
-            Lorena quiere vincularse con vos.
-          </p>
-        </div>
-        <Button onClick={handleAccept} className="w-full mt-4">
-          Aceptar
-        </Button>
-      </div>
-    );
-  }
 
   if (sent) {
     return (
@@ -91,7 +73,8 @@ export default function LinkPartnerPage() {
           type="email"
           placeholder="correo@ejemplo.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); setError(""); }}
+          error={error}
         />
         <Button type="submit" loading={loading} className="w-full mt-2">
           Enviar invitación

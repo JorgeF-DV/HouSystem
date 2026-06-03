@@ -12,7 +12,14 @@ export function ProgressBar({ percent, className }: ProgressBarProps) {
   const color = getProgressColor(clamped);
 
   return (
-    <div className={`h-2 rounded-pill bg-surface-2 overflow-hidden ${className ?? ""}`}>
+    <div
+      role="progressbar"
+      aria-valuenow={clamped}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`${Math.round(clamped)}%`}
+      className={`h-2 rounded-pill bg-surface-2 overflow-hidden ${className ?? ""}`}
+    >
       <div
         className="h-full rounded-pill transition-all duration-500 ease-out"
         style={{ width: `${clamped}%`, backgroundColor: color }}

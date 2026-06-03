@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { AlertBanner } from "@/components/ui/AlertBanner";
@@ -23,9 +25,13 @@ const categories = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
+
+  useEffect(() => { document.title = "Dashboard — HouSystem"; }, []);
   const totalSpent = categories.reduce((s, c) => s + c.spent, 0);
   const totalBudget = categories.reduce((s, c) => s + c.budget, 0);
   const percentUsed = Math.round((totalSpent / totalBudget) * 100);
+  const alertCategory = categories.find((c) => (c.spent / c.budget) * 100 >= 90);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10 md:px-6">
@@ -40,9 +46,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Alert */}
-      {percentUsed >= 80 && (
-        <AlertBanner variant="warning" className="mb-6" actionLabel="Ver finanzas" onAction={() => {}}>
-          El presupuesto de Salidas está al 90%
+      {alertCategory && (
+        <AlertBanner variant="warning" className="mb-6" actionLabel="Ver finanzas" onAction={() => router.push("/finanzas")}>
+          {alertCategory.name} está al {Math.round((alertCategory.spent / alertCategory.budget) * 100)}% del presupuesto
         </AlertBanner>
       )}
 
@@ -111,7 +117,7 @@ export default function DashboardPage() {
               <IconCheckbox size={20} className="text-lorena" />
             </div>
             <div className="flex-1">
-              <p className="font-dm-sans text-[15px] text-text-primary text-tertiary">
+              <p className="font-dm-sans text-[15px] text-text-primary">
                 Sacar la basura
               </p>
               <p className="font-dm-sans text-[12px] text-text-tertiary">Tarea pendiente</p>

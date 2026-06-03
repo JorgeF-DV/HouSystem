@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -10,13 +10,23 @@ import { IconArrowLeft, IconTarget } from "@tabler/icons-react";
 
 export default function AgregarMetaPage() {
   const router = useRouter();
+  useEffect(() => { document.title = "Nueva meta — HouSystem"; }, []);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [platform, setPlatform] = useState("");
   const [link, setLink] = useState("");
   const [initial, setInitial] = useState("");
 
+  const [errors, setErrors] = useState<{ name?: string; price?: string }>({});
   const hasData = name || price || platform || link || initial;
+
+  const validate = () => {
+    const errs: typeof errors = {};
+    if (!name.trim()) errs.name = "El nombre es obligatorio";
+    if (!price || Number(price) <= 0) errs.price = "El precio debe ser mayor a 0";
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 md:py-10 md:px-6">
@@ -56,6 +66,7 @@ export default function AgregarMetaPage() {
           placeholder="Ej: Sillón nuevo"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          error={errors.name}
         />
         <Input
           label="Precio objetivo"
@@ -63,6 +74,7 @@ export default function AgregarMetaPage() {
           placeholder="$0"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
+          error={errors.price}
         />
         <div>
           <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">
@@ -73,6 +85,7 @@ export default function AgregarMetaPage() {
               <button
                 key={p}
                 onClick={() => setPlatform(p)}
+                aria-pressed={platform === p}
                 className={`flex-1 py-3 rounded-btn border text-[13px] font-dm-sans transition-colors ${
                   platform === p
                     ? "border-green text-green bg-green/10"
@@ -99,7 +112,7 @@ export default function AgregarMetaPage() {
         />
       </div>
 
-      <Button className="w-full" onClick={() => router.push("/metas")}>
+      <Button className="w-full" onClick={() => { if (validate()) router.push("/metas"); }}>
         Crear meta
       </Button>
     </div>

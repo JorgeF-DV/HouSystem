@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
@@ -16,12 +16,18 @@ const defaultCategories = [
 ];
 
 export default function PresupuestosPage() {
+  useEffect(() => { document.title = "Presupuestos — HouSystem"; }, []);
   const [budgets, setBudgets] = useState(defaultCategories);
   const [dirty, setDirty] = useState(false);
 
+  const [errors, setErrors] = useState<Record<number, string>>({});
+
   const updateBudget = (index: number, value: string) => {
+    const num = Number(value);
+    if (num < 0) { setErrors((prev) => ({ ...prev, [index]: "No puede ser negativo" })); return; }
+    setErrors((prev) => { const c = { ...prev }; delete c[index]; return c; });
     const updated = [...budgets];
-    updated[index] = { ...updated[index], budget: Number(value) || 0 };
+    updated[index] = { ...updated[index], budget: num || 0 };
     setBudgets(updated);
     setDirty(true);
   };
@@ -52,12 +58,15 @@ export default function PresupuestosPage() {
             <span className="font-dm-sans text-[15px] text-text-secondary flex-1">{cat.name}</span>
             <div className="flex items-center gap-1">
               <span className="font-dm-sans text-[12px] text-text-tertiary">$</span>
-              <input
-                type="number"
-                value={cat.budget}
-                onChange={(e) => updateBudget(i, e.target.value)}
-                className="w-24 text-right bg-transparent text-text-primary font-dm-sans text-[15px] outline-none"
-              />
+              <div className="flex flex-col items-end">
+                <input
+                  type="number"
+                  value={cat.budget}
+                  onChange={(e) => updateBudget(i, e.target.value)}
+                  className="w-24 text-right bg-transparent text-text-primary font-dm-sans text-[15px] outline-none"
+                />
+                {errors[i] && <span className="text-coral text-[11px] font-dm-sans">{errors[i]}</span>}
+              </div>
             </div>
           </div>
         ))}

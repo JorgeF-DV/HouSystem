@@ -51,6 +51,11 @@ src/
 - Metas: grid, detalle con abono e historial, formulario de creación con preview
 - Planes: mini calendario, eventos, recomendaciones con match %, preferencias
 - Globales: notificaciones, perfil (desvincular), ajustes (tema, toggles, export)
+- **Páginas de error:** `error.tsx`, `not-found.tsx`, `loading.tsx` en raíz y `(main)`
+- **Validación completa** en todos los formularios (login, register, metas, finanzas, tareas, presupuestos)
+- **Accesibilidad:** roles ARIA, `aria-current`, `aria-pressed`, `aria-label`, keyboard nav, focus trap en BottomSheet, `role="switch"` en toggles
+- **SEO:** `document.title` dinámico por página
+- **Tests:** 13 suites, 56 tests — cobertura completa de todos los componentes UI
 - Linting y build pasan sin errores ni warnings
 
 ### ❌ Pendiente (backend)
@@ -71,8 +76,9 @@ src/
 - Breadcrumbs en pantallas secundarias
 - Toggle mostrar/ocultar contraseña en Login
 - Safe area testing en iOS
-- Estados vacíos y de error completos
 - Animaciones de entrada/transición
+- PWA: manifest.json, apple-touch-icon, service worker
+- Uso de `next/image` para assets optimizados
 
 ---
 
@@ -100,6 +106,12 @@ npm run test:watch  # Tests en watch mode
 | `StatusPill.test.tsx` | 4 | Variantes positive/alerta/critico con colores correctos |
 | `Button.test.tsx` | 6 | Click, disabled, loading spinner, no click cuando disabled |
 | `AlertBanner.test.tsx` | 3 | Render message, action button, sin action si no hay label |
+| `Input.test.tsx` | 5 | Label, placeholder, error message, error border, sin error |
+| `Sidebar.test.tsx` | 4 | Nav items, aria-current, avatars, settings link |
+| `BottomNav.test.tsx` | 3 | Nav items, aria-current en activo, sin aria-current en inactivo |
+| `BottomSheet.test.tsx` | 3 | Título y children, role dialog, hidden cuando closed |
+| `Skeleton.test.tsx` | 3 | Clase shimmer, className custom, aria-hidden |
+| `Toast.test.tsx` | 4 | Mensaje visible, role alert, auto-hide tras duration, no hide antes |
 
 ### Reglas
 - Test por componente en `src/components/ui/__tests__/`. Tests de utilidades en `src/lib/__tests__/`.

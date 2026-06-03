@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
@@ -10,6 +10,7 @@ import { IconArrowLeft, IconMapPin, IconClock, IconCurrencyDollar, IconCalendarE
 
 export default function EventoDetailPage() {
   const router = useRouter();
+  useEffect(() => { document.title = "Evento — HouSystem"; }, []);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const event = {

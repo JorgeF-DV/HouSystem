@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
@@ -10,6 +10,7 @@ import { IconArrowLeft, IconLink } from "@tabler/icons-react";
 
 export default function PerfilPage() {
   const router = useRouter();
+  useEffect(() => { document.title = "Perfil — HouSystem"; }, []);
   const [showUnlink, setShowUnlink] = useState(false);
 
   return (

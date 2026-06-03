@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { IconArrowLeft, IconChecks, IconWallet, IconCheckbox, IconCalendarEvent } from "@tabler/icons-react";
 
@@ -31,6 +32,7 @@ const notifications = [
 ];
 
 export default function NotificacionesPage() {
+  useEffect(() => { document.title = "Notificaciones — HouSystem"; }, []);
   const hasUnread = notifications.some((n) => n.unread);
 
   return (

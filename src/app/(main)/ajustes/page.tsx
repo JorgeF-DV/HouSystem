@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { IconArrowLeft, IconDownload, IconTrash, IconInfoCircle } from "@tabler/icons-react";
@@ -11,6 +12,7 @@ const notificationTypes = [
 ];
 
 export default function AjustesPage() {
+  useEffect(() => { document.title = "Ajustes — HouSystem"; }, []);
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 md:py-10 md:px-6">
       {/* Header */}
@@ -28,6 +30,7 @@ export default function AjustesPage() {
           {["Oscuro", "Claro", "Sistema"].map((theme) => (
             <button
               key={theme}
+              aria-pressed={theme === "Oscuro"}
               className={`flex-1 py-3 rounded-btn border text-[13px] font-dm-sans transition-colors ${
                 theme === "Oscuro"
                   ? "border-green text-green bg-green/10"
@@ -50,7 +53,10 @@ export default function AjustesPage() {
               className="flex items-center justify-between py-3 px-4 rounded-btn bg-surface-1 border border-surface-2"
             >
               <span className="font-dm-sans text-[15px] text-text-primary">{n.label}</span>
-              <div
+              <button
+                role="switch"
+                aria-checked={n.enabled}
+                aria-label={n.label}
                 className={`w-10 h-6 rounded-pill relative transition-colors cursor-pointer ${
                   n.enabled ? "bg-green" : "bg-surface-2"
                 }`}
@@ -60,7 +66,7 @@ export default function AjustesPage() {
                     n.enabled ? "translate-x-[18px]" : "translate-x-0.5"
                   }`}
                 />
-              </div>
+              </button>
             </div>
           ))}
         </div>

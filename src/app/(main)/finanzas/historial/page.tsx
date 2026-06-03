@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Avatar } from "@/components/ui/Avatar";
 import { formatCurrency } from "@/lib/utils";
@@ -20,6 +21,7 @@ const expenses = [
 ];
 
 export default function HistorialPage() {
+  useEffect(() => { document.title = "Historial — HouSystem"; }, []);
   const total = expenses.reduce((s, d) => s + d.items.reduce((si, i) => si + i.amount, 0), 0);
 
   return (
@@ -48,9 +50,9 @@ export default function HistorialPage() {
         <div key={day.day} className="mb-6">
           <h3 className="font-dm-sans text-[13px] text-text-tertiary font-medium mb-2">{day.day}</h3>
           <div className="flex flex-col gap-2">
-            {day.items.map((item, i) => (
+            {day.items.map((item) => (
               <div
-                key={i}
+                key={item.description + item.amount}
                 className="flex items-center gap-3 py-3 px-4 rounded-btn hover:bg-surface-1 transition-colors cursor-pointer"
               >
                 <span className="text-lg w-8 h-8 flex items-center justify-center">{item.icon}</span>

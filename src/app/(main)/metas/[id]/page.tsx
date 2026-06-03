@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -25,8 +25,16 @@ const contributions = [
 ];
 
 export default function MetaDetailPage() {
+  useEffect(() => { document.title = "Meta — HouSystem"; }, []);
   const [amount, setAmount] = useState("");
   const [who, setWho] = useState<"jorge" | "lorena">("jorge");
+  const [error, setError] = useState("");
+
+  const validate = () => {
+    if (!amount || Number(amount) <= 0) { setError("El monto debe ser mayor a 0"); return false; }
+    setError("");
+    return true;
+  };
 
   const percent = Math.round((goalData.saved / goalData.price) * 100);
   const remaining = goalData.price - goalData.saved;
@@ -104,7 +112,8 @@ export default function MetaDetailPage() {
             type="number"
             placeholder="$0"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => { setAmount(e.target.value); setError(""); }}
+            error={error}
           />
           <div>
             <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">
@@ -133,7 +142,7 @@ export default function MetaDetailPage() {
               </button>
             </div>
           </div>
-          <Button className="w-full">Guardar abono</Button>
+          <Button className="w-full" onClick={() => { if (validate()) { /* persist */ } }}>Guardar abono</Button>
         </div>
       </Card>
 
@@ -141,8 +150,8 @@ export default function MetaDetailPage() {
       <Card>
         <h2 className="font-syne text-[18px] font-medium text-text-primary mb-4">Historial de abonos</h2>
         <div className="flex flex-col gap-3">
-          {contributions.map((c, i) => (
-            <div key={i} className="flex items-center gap-3">
+          {contributions.map((c) => (
+            <div key={`${c.date}-${c.who}-${c.amount}`} className="flex items-center gap-3">
               <Avatar user={c.who} size={24} />
               <span className="font-dm-sans text-[13px] text-text-secondary flex-1">{c.date}</span>
               <span className="font-dm-sans text-[15px] text-text-primary font-medium">

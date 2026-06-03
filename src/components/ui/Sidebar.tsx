@@ -43,6 +43,7 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-btn text-[14px] font-dm-sans font-medium transition-colors",
                   active
@@ -50,7 +51,7 @@ export function Sidebar() {
                     : "text-text-tertiary hover:text-text-secondary hover:bg-surface-1"
                 )}
               >
-                <Icon size={20} stroke={active ? 2 : 1.5} />
+                <Icon size={20} stroke={active ? 2 : 1.5} aria-hidden="true" />
                 {item.label}
               </Link>
             );
@@ -68,9 +69,10 @@ export function Sidebar() {
         </Link>
         <Link
           href="/notificaciones"
+          aria-label="Notificaciones"
           className="flex items-center gap-2 text-text-tertiary hover:text-text-secondary transition-colors"
         >
-          <IconBell size={18} />
+          <IconBell size={18} aria-hidden="true" />
         </Link>
       </div>
     </aside>

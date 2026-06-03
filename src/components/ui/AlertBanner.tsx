@@ -27,6 +27,7 @@ export function AlertBanner({
 }: AlertBannerProps) {
   return (
     <div
+      role="alert"
       className={cn(
         "border-l-3 py-3 px-4 rounded-btn text-[13px] font-dm-sans flex items-center gap-3",
         variants[variant],

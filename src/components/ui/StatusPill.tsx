@@ -20,6 +20,7 @@ const variants: Record<PillVariant, string> = {
 export function StatusPill({ variant, children, className }: StatusPillProps) {
   return (
     <span
+      role="status"
       className={cn(
         "inline-flex items-center px-[10px] py-[3px] rounded-pill text-[11px] font-dm-sans font-medium",
         variants[variant],

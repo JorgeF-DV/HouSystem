@@ -31,6 +31,7 @@ export function Button({
     <button
       className={cn(variants[variant], "inline-flex items-center justify-center gap-2", className)}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
     >
       {loading && (

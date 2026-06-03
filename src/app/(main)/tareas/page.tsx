@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
@@ -24,6 +25,7 @@ const completed = [
 ];
 
 export default function TareasPage() {
+  useEffect(() => { document.title = "Tareas — HouSystem"; }, []);
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10 md:px-6 pb-24 md:pb-10">
       {/* Header */}
@@ -31,9 +33,10 @@ export default function TareasPage() {
         <h1 className="font-syne text-[28px] font-medium text-text-primary">Tareas</h1>
         <Link
           href="/tareas/gestionar"
+          aria-label="Gestionar tareas"
           className="p-2 hover:bg-surface-1 rounded-btn transition-colors"
         >
-          <IconAdjustmentsHorizontal size={20} className="text-text-secondary" />
+          <IconAdjustmentsHorizontal size={20} className="text-text-secondary" aria-hidden="true" />
         </Link>
       </div>
       <p className="font-dm-sans text-[13px] text-text-tertiary mb-6">

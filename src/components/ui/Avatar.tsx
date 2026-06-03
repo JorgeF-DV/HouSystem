@@ -20,6 +20,8 @@ export function Avatar({ user, size = 36, className }: AvatarProps) {
 
   return (
     <div
+      role="img"
+      aria-label={user === "jorge" ? "Jorge" : "Lorena"}
       className={cn("rounded-full flex items-center justify-center font-syne font-medium", className)}
       style={{
         width: size,

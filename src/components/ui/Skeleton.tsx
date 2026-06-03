@@ -7,5 +7,5 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className }: SkeletonProps) {
-  return <div className={cn("shimmer rounded", className)} />;
+  return <div aria-hidden="true" className={cn("shimmer rounded", className)} />;
 }

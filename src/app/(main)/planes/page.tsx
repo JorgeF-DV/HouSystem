@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { StatusPill } from "@/components/ui/StatusPill";
@@ -33,6 +34,7 @@ const today = new Date();
 const currentMonth = today.toLocaleString("es-AR", { month: "long", year: "numeric" });
 
 export default function PlanesPage() {
+  useEffect(() => { document.title = "Planes — HouSystem"; }, []);
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 md:py-10 md:px-6 pb-24 md:pb-10">
       {/* Header */}

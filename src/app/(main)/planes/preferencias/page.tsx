@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -20,6 +20,7 @@ const categories = [
 const priceRanges = ["Gratis", "Hasta $50K", "Hasta $150K", "Sin límite"];
 
 export default function PreferenciasPage() {
+  useEffect(() => { document.title = "Preferencias — HouSystem"; }, []);
   const [selected, setSelected] = useState<string[]>(["Gastronomía", "Cine"]);
   const [city, setCity] = useState("Buenos Aires");
   const [priceRange, setPriceRange] = useState("Hasta $50K");
@@ -50,6 +51,7 @@ export default function PreferenciasPage() {
             <button
               key={cat}
               onClick={() => toggle(cat)}
+              aria-pressed={selected.includes(cat)}
               className={`px-4 py-2 rounded-pill text-[13px] font-dm-sans transition-colors ${
                 selected.includes(cat)
                   ? "bg-green text-black font-medium"
@@ -82,6 +84,7 @@ export default function PreferenciasPage() {
             <button
               key={range}
               onClick={() => setPriceRange(range)}
+              aria-pressed={priceRange === range}
               className={`px-4 py-2 rounded-pill text-[13px] font-dm-sans transition-colors ${
                 priceRange === range
                   ? "bg-green text-black font-medium"

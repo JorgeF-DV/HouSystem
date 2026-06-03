@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { IconHeartHandshake } from "@tabler/icons-react";
 
 export default function WelcomePage() {
+  useEffect(() => { document.title = "HouSystem"; }, []);
   return (
     <div className="flex flex-col items-center text-center gap-8">
       <div className="w-20 h-20 rounded-full bg-green/10 flex items-center justify-center">
