@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { IconUsers } from "@tabler/icons-react";
+import { EMAIL_REGEX } from "@/lib/utils";
 
 export default function LinkPartnerPage() {
   useEffect(() => { document.title = "Vincular pareja — HouSystem"; }, []);
@@ -14,19 +15,32 @@ export default function LinkPartnerPage() {
 
   const validate = () => {
     if (!email.trim()) { setError("El email es obligatorio"); return false; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Email inválido"); return false; }
+    if (!EMAIL_REGEX.test(email)) { setError("Email inválido"); return false; }
     setError("");
     return true;
   };
 
-  const handleSendInvite = (e: React.FormEvent) => {
+  const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const res = await fetch("/api/partner/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ partnerEmail: email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Error al enviar invitación");
+        return;
+      }
       setSent(true);
-    }, 1000);
+    } catch {
+      setError("Error de conexión");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (sent) {

@@ -1,128 +1,87 @@
-# HouSystem
+# HouSystem 🏠
 
-Herramienta de convivencia para parejas. Finanzas compartidas, tareas, metas de ahorro y planes.
+Herramienta de convivencia para parejas: finanzas compartidas, tareas del hogar, metas de ahorro y planes.
 
-**Stack:** Next.js 16 + Tailwind v4 + TypeScript + Tabler Icons
+## Stack
 
----
+| Capa | Tecnología |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| UI | React 19, Tailwind CSS v4, Tabler Icons |
+| DB | PostgreSQL (Supabase) |
+| ORM | Prisma 7 (`@prisma/adapter-pg`) |
+| Auth | Supabase Auth SSR |
+| Testing | Vitest 4 + RTL |
+
+## Setup rápido
+
+```bash
+npm install
+cp .env.example .env.local
+# Editar .env.local con credenciales de Supabase
+npm run db:generate
+npm run dev
+```
+
+> `DATABASE_URL` debe usar el **connection pooler** (puerto `6543`) sin `sslmode=require`. SSL se configura vía adapter.
 
 ## Arquitectura
 
 ```
 src/
 ├── app/
-│   ├── (onboarding)/   # Welcome, Register, Login, Link partner
-│   ├── (main)/         # Dashboard, Finanzas, Tareas, Metas, Planes, Perfil, Ajustes
-│   ├── layout.tsx      # Root layout (fonts Syne + DM Sans)
-│   └── globals.css     # Design system tokens (@theme)
-├── components/
-│   └── ui/             # Card, Button, Input, Avatar, ProgressBar, BottomSheet, etc.
-└── lib/
-    └── utils.ts        # cn(), formatCurrency(), getProgressColor(), etc.
+│   ├── api/          # 33 endpoints REST (auth, finanzas, tareas, metas, planes...)
+│   ├── (onboarding)/ # Login, registro, vincular pareja
+│   └── (main)/       # 14 páginas protegidas (dashboard, finanzas, tareas...)
+├── components/ui/    # 14 componentes de diseño (Card, Button, BottomSheet...)
+├── hooks/            # useApi() — fetch + loading + error + redirect
+├── lib/
+│   ├── auth.ts       # requireAuth(), requirePartnerAuth()
+│   ├── api-utils.ts  # apiSuccess(), apiError(), handleApiError()
+│   ├── db.ts         # PrismaClient singleton con PrismaPg adapter
+│   └── utils.ts      # formatCurrency(), getRouteId(), cn()...
+└── middleware.ts     # Protege rutas main, redirige a /login
 ```
 
-### Diseño
-- **Mobile-first:** 390px base, bottom nav. ≥768px: sidebar 240px. ≥1280px: grid 3 cols.
-- **Colores semánticos:** Verde ≤70% → Ámbar 71-89% → Coral ≥90% en progress bars.
-- **Tipografía:** Syne (títulos/números), DM Sans (cuerpo/UI). Ambas self-hosted via `next/font`.
-- **Safe areas:** `env(safe-area-inset-bottom)` en bottom nav y bottom sheets.
+## API — resumen
 
-### Decisiones registradas
-| Decisión | Opción descartada | Motivo |
-|---|---|---|
-| App Router (no Pages) | Pages Router | Ya venía por defecto con create-next-app |
-| Tailwind v4 CSS-first | tailwind.config.js | Versión del template; `@theme` en CSS |
-| `cn()` casero | clsx | Evitar dependencia extra; implementación trivial |
-| `"use client"` en cada página | Server Components | Toda página usa interactividad (estados, efectos) |
-| Datos mock inline | API / DB | Fase inicial; pendiente backend |
+| Recurso | Endpoints clave |
+|---|---|
+| Auth | `POST /api/auth/{login,register,logout}`, `GET /api/auth/me` |
+| Dashboard | `GET /api/dashboard` — resumen del mes |
+| Finanzas | `GET /api/finances`, `GET/PUT /api/budgets`, `GET/POST /api/expenses`, `PUT/DELETE /api/expenses/[id]` |
+| Tareas | CRUD `/api/tasks`, `POST /api/tasks/[id]/{take,complete,reopen}` |
+| Metas | CRUD `/api/goals`, `GET/POST /api/goals/[id]/contributions` |
+| Planes | CRUD `/api/events`, `GET /api/recommendations`, `GET/PUT /api/preferences` |
+| Pareja | `POST /api/partner/{invite,accept,unlink}`, `GET /api/partner/status` |
+| Notificaciones | `GET /api/notifications`, `POST /api/notifications/read-all`, `GET/PUT /api/notifications/preferences` |
+| Perfil | `GET/PUT /api/profile`, `GET/PUT /api/settings` |
 
----
+## Frontend — páginas
 
-## Estado del proyecto
+### Onboarding
+`/welcome` → `/login` → `/register` → `/link-partner`
 
-### ✅ Implementado
-- **21 rutas** cubriendo todos los módulos del spec
-- Sistema de diseño completo (colores, tipografía, espaciado, componentes)
-- Layout responsive (bottom nav mobile / sidebar desktop)
-- Onboarding: Welcome, Register, Login, Vincular pareja
-- Dashboard con widgets de salud financiera, día de hoy, tareas, eventos
-- Finanzas: principal con selector de mes, aportes, pozo, categorías, FAB + bottom sheet registro, historial, presupuestos editables
-- Tareas: kanban (disponibles/progreso/completadas), gestión CRUD con bottom sheet
-- Metas: grid, detalle con abono e historial, formulario de creación con preview
-- Planes: mini calendario, eventos, recomendaciones con match %, preferencias
-- Globales: notificaciones, perfil (desvincular), ajustes (tema, toggles, export)
-- **Páginas de error:** `error.tsx`, `not-found.tsx`, `loading.tsx` en raíz y `(main)`
-- **Validación completa** en todos los formularios (login, register, metas, finanzas, tareas, presupuestos)
-- **Accesibilidad:** roles ARIA, `aria-current`, `aria-pressed`, `aria-label`, keyboard nav, focus trap en BottomSheet, `role="switch"` en toggles
-- **SEO:** `document.title` dinámico por página
-- **Tests:** 13 suites, 56 tests — cobertura completa de todos los componentes UI
-- Linting y build pasan sin errores ni warnings
+### Main (autenticado)
+`/dashboard`, `/finanzas` + `/historial` + `/presupuestos`,
+`/tareas` + `/gestionar`, `/metas` + `/agregar` + `/[id]`,
+`/planes` + `/[id]` + `/preferencias`,
+`/notificaciones`, `/perfil`, `/ajustes`
 
-### ❌ Pendiente (backend)
-- Autenticación real (JWT/sessions)
-- Vínculo de pareja con invitaciones reales
-- API routes o backend server
-- Base de datos (SQLite / PostgreSQL / Supabase)
-- Persistencia (al menos localStorage mientras tanto)
+Todas las páginas se conectan a APIs reales con loading skeletons y manejo de errores.
 
-### ❌ Pendiente (frontend)
-- Tiempo real en tareas (WebSocket/SSE para evitar conflictos de selección)
-- Optimistic updates con rollback en error
-- Toast de confirmación conectado a acciones
-- Sheet → modal centrado en desktop (≥768px)
-- Grid responsivo completo (dashboard 3 cols en ≥1280px, metas 2 cols)
-- Badge de alerta de precio en metas (↑/↓)
-- Swipe left para eliminar en notificaciones e historial
-- Breadcrumbs en pantallas secundarias
-- Toggle mostrar/ocultar contraseña en Login
-- Safe area testing en iOS
-- Animaciones de entrada/transición
-- PWA: manifest.json, apple-touch-icon, service worker
-- Uso de `next/image` para assets optimizados
-
----
-
-## Comandos
+## Testing
 
 ```bash
-npm run dev         # Dev server
-npm run build       # Build production
-npm run lint        # ESLint
-npm run test        # Tests (Vitest)
-npm run test:watch  # Tests en watch mode
+npm run test           # 56 tests, 13 suites
+npm run test:watch     # Modo watch
 ```
 
-## Tests
+## Cuentas de prueba
 
-**Framework:** Vitest + React Testing Library + jsdom
-
-### Qué cubren
-| Archivo | Tests | Lo que detectan |
+| Email | Password | Rol |
 |---|---|---|
-| `utils.test.ts` | 8 | `cn()` filtra falsy, `formatCurrency()` formato ARS, `getProgressColor()` boundaries semánticos |
-| `ProgressBar.test.tsx` | 7 | Ancho, clamping 0-100%, colores semánticos por rango, className |
-| `Avatar.test.tsx` | 3 | Iniciales correctas (J/L), tamaño custom |
-| `Card.test.tsx` | 3 | Render children, skeleton loading, hover state |
-| `StatusPill.test.tsx` | 4 | Variantes positive/alerta/critico con colores correctos |
-| `Button.test.tsx` | 6 | Click, disabled, loading spinner, no click cuando disabled |
-| `AlertBanner.test.tsx` | 3 | Render message, action button, sin action si no hay label |
-| `Input.test.tsx` | 5 | Label, placeholder, error message, error border, sin error |
-| `Sidebar.test.tsx` | 4 | Nav items, aria-current, avatars, settings link |
-| `BottomNav.test.tsx` | 3 | Nav items, aria-current en activo, sin aria-current en inactivo |
-| `BottomSheet.test.tsx` | 3 | Título y children, role dialog, hidden cuando closed |
-| `Skeleton.test.tsx` | 3 | Clase shimmer, className custom, aria-hidden |
-| `Toast.test.tsx` | 4 | Mensaje visible, role alert, auto-hide tras duration, no hide antes |
+| `jorge@housystem.com` | `test123456` | jorge |
+| `lorena@housystem.com` | `test123456` | lorena |
 
-### Reglas
-- Test por componente en `src/components/ui/__tests__/`. Tests de utilidades en `src/lib/__tests__/`.
-- No usar `toHaveStyle()` con valores de unidad — jsdom no computa inline styles con unidades correctamente. Usar `.style.width` directamente.
-- jsdom devuelve colores en formato `rgb()`. Usar `rgb(0, 200, 150)` en vez de `#00C896`.
-- Antes de commitear: `npm run test && npm run lint && npm run build`
-
-## Convenciones
-
-- **Componentes:** `"use client"` en páginas con interactividad. UI components en `src/components/ui/`.
-- **Estilos:** Tailwind utility classes + `@theme` tokens. Sin CSS modules ni archivos .css adicionales.
-- **Iconos:** `@tabler/icons-react`. Importar solo los que se usan.
-- **Colores semánticos:** Usar `getProgressColor(percent)` de `src/lib/utils.ts` para progress bars.
-- **Nuevo feature:** Documentar en este README bajo "Decisiones registradas" + agregar al checklist de estado.
+Vinculadas como pareja con presupuestos, gastos, tareas, metas y eventos creados.

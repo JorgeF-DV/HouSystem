@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { EMAIL_REGEX } from "@/lib/utils";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -15,12 +16,13 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirm?: string }>({});
+  const [serverError, setServerError] = useState("");
 
   const validate = () => {
     const errs: typeof errors = {};
     if (!name.trim()) errs.name = "El nombre es obligatorio";
     if (!email.trim()) errs.email = "El email es obligatorio";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Email inválido";
+    else if (!EMAIL_REGEX.test(email)) errs.email = "Email inválido";
     if (!password) errs.password = "La contraseña es obligatoria";
     else if (password.length < 6) errs.password = "Mínimo 6 caracteres";
     if (confirm !== password) errs.confirm = "Las contraseñas no coinciden";
@@ -28,14 +30,28 @@ export default function RegisterPage() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setServerError("");
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setServerError(data.error || "Error al crear cuenta");
+        return;
+      }
       router.push("/link-partner");
-    }, 1000);
+    } catch {
+      setServerError("Error de conexión");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,6 +76,10 @@ export default function RegisterPage() {
           onChange={(e) => setConfirm(e.target.value)}
           error={errors.confirm}
         />
+
+        {serverError && (
+          <p className="text-[13px] text-coral font-dm-sans">{serverError}</p>
+        )}
 
         <Button type="submit" loading={loading} className="w-full mt-2">
           Crear cuenta

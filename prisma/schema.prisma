@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  jorge
+  lorena
+}
+
+enum TaskStatus {
+  available
+  in_progress
+  completed
+}
+
+enum TaskFrequency {
+  unica
+  semanal
+  mensual
+}
+
+enum InvitationStatus {
+  pending
+  accepted
+  declined
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(jorge)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  partnerId String?
+  partner   Partner? @relation("PartnerUsers", fields: [partnerId], references: [id])
+
+  // Relationships
+  contributions          GoalContribution[]
+  assignedTasks          Task[]             @relation("TaskAssignee")
+  createdEvents          Event[]            @relation("EventCreator")
+  paidExpenses           Expense[]
+  preferences            UserPreferences?
+  settings               UserSettings?
+  notifications          Notification[]
+  notificationPreferences NotificationPreference[]
+  invitationsSent        Invitation[]       @relation("InvitationSender")
+  invitationsReceived    Invitation[]       @relation("InvitationReceiver")
+
+  @@map("users")
+}
+
+model Partner {
+  id          String   @id @default(uuid())
+  linkedSince DateTime @default(now())
+
+  users    User[]             @relation("PartnerUsers")
+  budgets  BudgetCategory[]
+  expenses Expense[]
+  goals    Goal[]
+  tasks    Task[]
+  events   Event[]
+  recommendations Recommendation[]
+
+  @@map("partners")
+}
+
+model Invitation {
+  id         String           @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     InvitationStatus @default(pending)
+  createdAt  DateTime         @default(now())
+
+  sender   User   @relation("InvitationSender", fields: [senderId], references: [id])
+  receiver User   @relation("InvitationReceiver", fields: [receiverId], references: [id])
+
+  @@map("invitations")
+}
+
+model BudgetCategory {
+  id        String @id @default(uuid())
+  partnerId String
+  name      String
+  icon      String
+  budget    Int
+  month     Int
+  year      Int
+
+  partner Partner @relation(fields: [partnerId], references: [id])
+
+  @@unique([partnerId, name, month, year])
+  @@map("budget_categories")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  partnerId   String
+  categoryName String
+  amount      Int
+  description String
+  paidById    String
+  date        DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id])
+  paidBy  User     @relation(fields: [paidById], references: [id])
+
+  @@map("expenses")
+}
+
+model Goal {
+  id        String   @id @default(uuid())
+  partnerId String
+  name      String
+  platform  String
+  price     Int
+  link      String?
+  createdAt DateTime @default(now())
+
+  partner       Partner            @relation(fields: [partnerId], references: [id])
+  contributions GoalContribution[]
+
+  @@map("goals")
+}
+
+model GoalContribution {
+  id             String   @id @default(uuid())
+  goalId         String
+  contributedById String
+  amount         Int
+  date           DateTime @default(now())
+
+  goal         Goal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  contributedBy User @relation(fields: [contributedById], references: [id])
+
+  @@map("goal_contributions")
+}
+
+model Task {
+  id         String       @id @default(uuid())
+  partnerId  String
+  name       String
+  duration   String
+  frequency  TaskFrequency @default(semanal)
+  status     TaskStatus    @default(available)
+  assignedTo String?
+  weekStart  DateTime
+  completedAt DateTime?
+  createdAt  DateTime      @default(now())
+
+  partner  Partner @relation(fields: [partnerId], references: [id])
+  assignee User?   @relation("TaskAssignee", fields: [assignedTo], references: [id])
+
+  @@map("tasks")
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  partnerId   String
+  name        String
+  date        String
+  time        String?
+  location    String?
+  price       String?
+  description String?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id])
+  createdBy User   @relation("EventCreator", fields: [createdById], references: [id])
+
+  @@map("events")
+}
+
+model Recommendation {
+  id        String @id @default(uuid())
+  partnerId String
+  category  String
+  name      String
+  date      String
+  price     String
+  match     Int
+
+  partner Partner @relation(fields: [partnerId], references: [id])
+
+  @@map("recommendations")
+}
+
+model UserPreferences {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  selectedCategories String[]
+  city              String   @default("Buenos Aires")
+  priceRange        String   @default("Hasta $50K")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_preferences")
+}
+
+model UserSettings {
+  id     String @id @default(uuid())
+  userId String @unique
+  theme  String @default("Oscuro")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_settings")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  message   String
+  unread    Boolean  @default(true)
+  href      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id      String  @id @default(uuid())
+  userId  String
+  type    String
+  enabled Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, type])
+  @@map("notification_preferences")
+}
