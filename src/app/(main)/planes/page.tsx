@@ -30,6 +30,7 @@ export default function PlanesPage() {
   const [eventTime, setEventTime] = useState("");
   const [eventLocation, setEventLocation] = useState("");
   const [saving, setSaving] = useState(false);
+  const [savingRec, setSavingRec] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const refetch = useCallback(async () => {
@@ -73,6 +74,15 @@ export default function PlanesPage() {
         refetch();
       }
     } catch {} finally { setSaving(false); }
+  };
+
+  const agendar = async (recId: string) => {
+    setSavingRec(recId);
+    try {
+      const r = await fetch(`/api/recommendations/${recId}/save`, { method: "POST" });
+      const d = await r.json();
+      if (d.event) refetch();
+    } catch {} finally { setSavingRec(null); }
   };
 
   if (loading) return <PlanesSkeleton />;
@@ -157,7 +167,7 @@ export default function PlanesPage() {
                     <span className="font-dm-sans text-[12px] font-medium">{rec.match}%</span>
                   </div>
                 </div>
-                <Button variant="secondary" className="w-full h-9 text-[12px]">Agendar</Button>
+                <Button variant="secondary" className="w-full h-9 text-[12px]" loading={savingRec === rec.id} onClick={() => agendar(rec.id)}>Agendar</Button>
               </Card>
             ))}
           </div>

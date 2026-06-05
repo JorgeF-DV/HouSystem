@@ -17,21 +17,3 @@ export async function GET() {
     return handleApiError(error, "notifications");
   }
 }
-
-export async function POST(req: Request) {
-  try {
-    await requireAuth();
-
-    const url = new URL(req.url);
-    const id = url.pathname.split("/").pop()!;
-
-    await prisma.notification.update({
-      where: { id },
-      data: { unread: false },
-    });
-
-    return apiSuccess({ message: "Notificación leída" });
-  } catch (error) {
-    return handleApiError(error, "notifications");
-  }
-}
