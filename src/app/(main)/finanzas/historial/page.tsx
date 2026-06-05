@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCurrency } from "@/lib/utils";
 import { IconArrowLeft, IconFilter, IconTrash } from "@tabler/icons-react";
@@ -21,7 +20,7 @@ export default function HistorialPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const fetchExpenses = async () => {
+  const refetch = useCallback(async () => {
     try {
       const r = await fetch("/api/expenses");
       const d = await r.json();
@@ -29,15 +28,15 @@ export default function HistorialPage() {
       setGrouped(d.expenses ?? {});
       setTotal(d.total ?? 0);
     } catch {} finally { setLoading(false); }
-  };
+  }, [router]);
 
-  useEffect(() => { fetchExpenses(); }, [router]);
+  useEffect(() => { refetch(); }, [refetch]);
 
   const deleteExpense = async (id: string) => {
     setDeleting(id);
     try {
       await fetch(`/api/expenses/${id}`, { method: "DELETE" });
-      fetchExpenses();
+      refetch();
     } catch {} finally { setDeleting(null); }
   };
 

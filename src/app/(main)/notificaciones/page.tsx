@@ -24,16 +24,16 @@ export default function NotificacionesPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchNotifications = async () => {
-    try {
-      const r = await fetch("/api/notifications");
-      const d = await r.json();
-      if (d.error) { router.push("/login"); return; }
-      setNotifications(d.notifications ?? []);
-    } catch {} finally { setLoading(false); }
-  };
-
-  useEffect(() => { fetchNotifications(); }, [router]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch("/api/notifications");
+        const d = await r.json();
+        if (d.error) { router.push("/login"); return; }
+        setNotifications(d.notifications ?? []);
+      } catch {} finally { setLoading(false); }
+    })();
+  }, [router]);
 
   const markAllRead = async () => {
     try {

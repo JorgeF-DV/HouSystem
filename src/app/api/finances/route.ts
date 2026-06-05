@@ -1,6 +1,6 @@
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import { apiSuccess, handleApiError } from "@/lib/api-utils";
 
 type BudgetCat = Awaited<ReturnType<typeof prisma.budgetCategory.findMany>>[number];
 type ExpenseEntry = Awaited<ReturnType<typeof prisma.expense.findMany>>[number];

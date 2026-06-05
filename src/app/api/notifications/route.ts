@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import { apiSuccess, handleApiError } from "@/lib/api-utils";
 
 export async function GET() {
   try {
@@ -20,7 +20,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const user = await requireAuth();
+    await requireAuth();
 
     const url = new URL(req.url);
     const id = url.pathname.split("/").pop()!;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -24,16 +24,16 @@ export default function GestionarTareasPage() {
   const [frequency, setFrequency] = useState("semanal");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const fetchTasks = async () => {
+  const refetch = useCallback(async () => {
     try {
       const r = await fetch("/api/tasks");
       const d = await r.json();
       if (d.error) { router.push("/login"); return; }
       setTasks([...d.available, ...d.inProgress, ...d.completed]);
     } catch {} finally { setLoading(false); }
-  };
+  }, [router]);
 
-  useEffect(() => { fetchTasks(); }, [router]);
+  useEffect(() => { refetch(); }, [refetch]);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -69,14 +69,14 @@ export default function GestionarTareasPage() {
         });
       }
       setSheetOpen(false);
-      fetchTasks();
+      refetch();
     } catch {} finally { setSaving(false); }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await fetch(`/api/tasks?id=${id}`, { method: "DELETE" });
-      fetchTasks();
+      refetch();
     } catch {}
   };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
@@ -34,7 +34,7 @@ export default function MetaDetailPage({ params }: { params: Promise<{ id: strin
   const [editPlatform, setEditPlatform] = useState("");
   const [editLink, setEditLink] = useState("");
 
-  const fetchGoal = async () => {
+  const refetch = useCallback(async () => {
     try {
       const r = await fetch(`/api/goals/${id}`);
       const d = await r.json();
@@ -45,9 +45,9 @@ export default function MetaDetailPage({ params }: { params: Promise<{ id: strin
       setEditPlatform(d.platform);
       setEditLink(d.link ?? "");
     } catch {} finally { setLoading(false); }
-  };
+  }, [id, router]);
 
-  useEffect(() => { fetchGoal(); }, [id, router]);
+  useEffect(() => { refetch(); }, [refetch]);
 
   const addContribution = async () => {
     if (!amount || Number(amount) <= 0) { setError("El monto debe ser mayor a 0"); return; }
@@ -60,7 +60,7 @@ export default function MetaDetailPage({ params }: { params: Promise<{ id: strin
         body: JSON.stringify({ amount: Number(amount) }),
       });
       const d = await r.json();
-      if (d.contribution) { setAmount(""); fetchGoal(); }
+      if (d.contribution) { setAmount(""); refetch(); }
     } catch {} finally { setSaving(false); }
   };
 
@@ -73,7 +73,7 @@ export default function MetaDetailPage({ params }: { params: Promise<{ id: strin
         body: JSON.stringify({ name: editName.trim(), price: Number(editPrice), platform: editPlatform, link: editLink || null }),
       });
       const d = await r.json();
-      if (!d.error) { setEditOpen(false); fetchGoal(); }
+      if (!d.error) { setEditOpen(false); refetch(); }
     } catch {} finally { setSaving(false); }
   };
 

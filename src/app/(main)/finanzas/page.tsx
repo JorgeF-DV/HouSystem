@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
@@ -32,7 +32,7 @@ export default function FinanzasPage() {
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<{ id: string; name: string; role: string }[]>([]);
 
-  const fetchData = async () => {
+  const refetch = useCallback(async () => {
     setLoading(true);
     try {
       const r = await fetch(`/api/finances?month=${monthIndex}&year=${year}`);
@@ -41,9 +41,9 @@ export default function FinanzasPage() {
       setData(d);
       setMembers(d.perMember.map((m: MemberInfo) => ({ id: m.userId, name: m.name, role: m.role })));
     } catch {} finally { setLoading(false); }
-  };
+  }, [monthIndex, year, router]);
 
-  useEffect(() => { fetchData(); }, [monthIndex, year, router]);
+  useEffect(() => { refetch(); }, [refetch]);
 
   const current = monthIndex === new Date().getMonth();
 
@@ -150,7 +150,7 @@ export default function FinanzasPage() {
         </button>
       )}
 
-      <AddExpenseSheet open={sheetOpen} onClose={() => setSheetOpen(false)} categories={categories} members={members} onSaved={fetchData} />
+      <AddExpenseSheet open={sheetOpen} onClose={() => setSheetOpen(false)} categories={categories} members={members} onSaved={refetch} />
     </div>
   );
 }

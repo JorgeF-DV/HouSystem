@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
@@ -32,7 +32,7 @@ export default function PlanesPage() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const fetchData = async () => {
+  const refetch = useCallback(async () => {
     try {
       const [eRes, rRes] = await Promise.all([
         fetch("/api/events"),
@@ -44,9 +44,9 @@ export default function PlanesPage() {
       setEvents(eData.events ?? []);
       setRecommendations(rData.recommendations ?? []);
     } catch {} finally { setLoading(false); }
-  };
+  }, [router]);
 
-  useEffect(() => { fetchData(); }, [router]);
+  useEffect(() => { refetch(); }, [refetch]);
 
   const validateEvent = () => {
     const errs: Record<string, string> = {};
@@ -70,7 +70,7 @@ export default function PlanesPage() {
         setSheetOpen(false);
         setEventName(""); setEventDate(""); setEventTime(""); setEventLocation("");
         setErrors({});
-        fetchData();
+        refetch();
       }
     } catch {} finally { setSaving(false); }
   };

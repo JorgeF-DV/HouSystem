@@ -24,24 +24,26 @@ export default function TareasPage() {
   const [loading, setLoading] = useState(true);
   const [taking, setTaking] = useState<string | null>(null);
 
-  const fetchTasks = async () => {
-    try {
-      const r = await fetch("/api/tasks");
-      const d = await r.json();
-      if (d.error) { router.push("/login"); return; }
-      setAvailable(d.available ?? []);
-      setInProgress(d.inProgress ?? []);
-      setCompleted(d.completed ?? []);
-    } catch {} finally { setLoading(false); }
-  };
-
-  useEffect(() => { fetchTasks(); }, [router]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch("/api/tasks");
+        const d = await r.json();
+        if (d.error) { router.push("/login"); return; }
+        setAvailable(d.available ?? []);
+        setInProgress(d.inProgress ?? []);
+        setCompleted(d.completed ?? []);
+      } catch {} finally { setLoading(false); }
+    })();
+  }, [router]);
 
   const takeTask = async (id: string) => {
     setTaking(id);
     try {
       await fetch(`/api/tasks/${id}/take`, { method: "POST" });
-      fetchTasks();
+      const r = await fetch("/api/tasks");
+      const d = await r.json();
+      if (!d.error) { setAvailable(d.available ?? []); setInProgress(d.inProgress ?? []); setCompleted(d.completed ?? []); }
     } catch {} finally { setTaking(null); }
   };
 
