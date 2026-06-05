@@ -108,7 +108,10 @@ export default function TareasPage() {
                 <Avatar user={task.assignee?.role ?? "jorge"} size={28} />
                 <div className="flex-1">
                   <p className="font-dm-sans text-[15px] text-text-primary">{task.name}</p>
-                  <StatusPill variant="alerta">En curso</StatusPill>
+                  <div className="flex items-center gap-2">
+                    <span className="font-dm-sans text-[12px] text-text-tertiary">{task.assignee?.name}</span>
+                    <StatusPill variant="alerta">En curso</StatusPill>
+                  </div>
                 </div>
               </Card>
             ))}
@@ -127,7 +130,7 @@ export default function TareasPage() {
                 <Avatar user={task.assignee?.role ?? "jorge"} size={28} />
                 <div className="flex-1">
                   <p className="font-dm-sans text-[15px] text-text-primary line-through">{task.name}</p>
-                  <p className="font-dm-sans text-[12px] text-text-tertiary">Completada</p>
+                  <span className="font-dm-sans text-[12px] text-text-tertiary">{task.assignee?.name} · Completada</span>
                 </div>
               </Card>
             ))}
