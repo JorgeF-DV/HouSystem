@@ -70,7 +70,10 @@ export default function HistorialPage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-dm-sans text-[15px] text-text-primary truncate">{item.description || item.categoryName}</p>
                 </div>
-                <Avatar user={item.paidBy.role} size={24} />
+                <div className="flex items-center gap-1.5 min-w-[80px]">
+                  <Avatar user={item.paidBy.role} size={22} />
+                  <span className="font-dm-sans text-[12px] text-text-tertiary truncate">{item.paidBy.name}</span>
+                </div>
                 <span className="font-dm-sans text-[15px] text-text-primary font-medium min-w-[70px] text-right">{formatCurrency(item.amount)}</span>
                 <button onClick={() => deleteExpense(item.id)} disabled={deleting === item.id}
                   className="p-1.5 rounded-btn hover:bg-coral/10 text-text-tertiary hover:text-coral opacity-0 group-hover:opacity-100 transition-all">

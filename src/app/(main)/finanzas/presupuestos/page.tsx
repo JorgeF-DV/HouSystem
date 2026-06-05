@@ -13,6 +13,23 @@ type BudgetCat = { id: string; name: string; icon: string; budget: number };
 
 const ICONS = ["🏠", "🍽️", "🛒", "🚗", "💡", "🎮", "🏋️", "👕", "📚", "🐾", "✈️", "💰"];
 
+const PRESETS: { name: string; icon: string }[] = [
+  { name: "Alquiler", icon: "🏠" },
+  { name: "Comida", icon: "🍽️" },
+  { name: "Supermercado", icon: "🛒" },
+  { name: "Transporte", icon: "🚗" },
+  { name: "Servicios", icon: "💡" },
+  { name: "Entretenimiento", icon: "🎮" },
+  { name: "Gimnasio", icon: "🏋️" },
+  { name: "Ropa", icon: "👕" },
+  { name: "Mascotas", icon: "🐾" },
+  { name: "Salud", icon: "🏥" },
+  { name: "Telecomunicaciones", icon: "📱" },
+  { name: "Viajes", icon: "✈️" },
+  { name: "Seguros", icon: "🛡️" },
+  { name: "Hogar", icon: "🔧" },
+];
+
 export default function PresupuestosPage() {
   const router = useRouter();
   useEffect(() => { document.title = "Presupuestos — HouSystem"; }, []);
@@ -137,6 +154,17 @@ export default function PresupuestosPage() {
 
       <Dialog open={showNew} onClose={() => setShowNew(false)} title="Nueva categoría">
         <div className="flex flex-col gap-3">
+          <div>
+            <label className="font-dm-sans text-[12px] text-text-tertiary block mb-2">Sugeridos</label>
+            <div className="flex flex-wrap gap-1.5">
+              {PRESETS.map((p) => (
+                <button key={p.name} onClick={() => { setNewName(p.name); setNewIcon(p.icon); }}
+                  className={`whitespace-nowrap px-3 py-1.5 rounded-pill text-[12px] font-dm-sans transition-colors ${newName === p.name ? "bg-green/20 text-green border border-green" : "bg-surface-2 text-text-secondary hover:bg-surface-3 border border-transparent"}`}>
+                  {p.icon} {p.name}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Nombre</label>
             <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Ej: Alquiler" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
