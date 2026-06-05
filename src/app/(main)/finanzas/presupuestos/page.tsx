@@ -15,24 +15,20 @@ const ICONS = ["🏠", "🍽️", "🛒", "🚗", "💡", "🎮", "🏋️", "�
 
 const PRESETS: { name: string; icon: string }[] = [
   { name: "Alquiler", icon: "🏠" },
-  { name: "Comida", icon: "🍽️" },
-  { name: "Supermercado", icon: "🛒" },
-  { name: "Transporte", icon: "🚗" },
-  { name: "Servicios", icon: "💡" },
-  { name: "Entretenimiento", icon: "🎮" },
-  { name: "Gimnasio", icon: "🏋️" },
-  { name: "Ropa", icon: "👕" },
-  { name: "Mascotas", icon: "🐾" },
-  { name: "Salud", icon: "🏥" },
-  { name: "Telecomunicaciones", icon: "📱" },
-  { name: "Viajes", icon: "✈️" },
+  { name: "Expensas", icon: "🏢" },
+  { name: "Luz", icon: "⚡" },
+  { name: "Gas", icon: "🔥" },
+  { name: "Agua", icon: "💧" },
+  { name: "Internet", icon: "📶" },
+  { name: "Teléfono", icon: "📱" },
   { name: "Seguros", icon: "🛡️" },
-  { name: "Hogar", icon: "🔧" },
+  { name: "ABL / Impuestos", icon: "📋" },
+  { name: "Alarma / Seguridad", icon: "🏘️" },
 ];
 
 export default function PresupuestosPage() {
   const router = useRouter();
-  useEffect(() => { document.title = "Presupuestos — HouSystem"; }, []);
+  useEffect(() => { document.title = "Gastos fijos — HouSystem"; }, []);
   const [budgets, setBudgets] = useState<BudgetCat[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -116,12 +112,12 @@ export default function PresupuestosPage() {
         <Link href="/finanzas" className="p-2 -ml-2 hover:bg-surface-1 rounded-btn transition-colors">
           <IconArrowLeft size={20} className="text-text-secondary" />
         </Link>
-        <h1 className="font-syne text-[22px] font-medium text-text-primary">Presupuestos</h1>
+        <h1 className="font-syne text-[22px] font-medium text-text-primary">Gastos fijos</h1>
       </div>
 
-      <p className="font-dm-sans text-[13px] text-text-tertiary mb-6 capitalize">
-        {new Date().toLocaleString("es-AR", { month: "long", year: "numeric" })}
-      </p>
+        <p className="font-dm-sans text-[13px] text-text-tertiary mb-6">
+          Gastos fijos del mes
+        </p>
 
       {budgets.length > 0 ? (
         <div className="flex flex-col gap-3 mb-6">
@@ -144,15 +140,15 @@ export default function PresupuestosPage() {
         </div>
       ) : (
         <p className="font-dm-sans text-[13px] text-text-tertiary text-center py-8 mb-4">
-          No hay presupuestos configurados.
+          No hay gastos fijos configurados.
         </p>
       )}
 
       <button onClick={() => setShowNew(true)} className="w-full mb-6 py-3 px-4 rounded-btn border-2 border-dashed border-surface-3 text-text-tertiary hover:text-text-secondary hover:border-text-tertiary transition-colors flex items-center justify-center gap-2 font-dm-sans text-[13px]">
-        <IconPlus size={16} /> Agregar categoría
+        <IconPlus size={16} /> Agregar gasto fijo
       </button>
 
-      <Dialog open={showNew} onClose={() => setShowNew(false)} title="Nueva categoría">
+      <Dialog open={showNew} onClose={() => setShowNew(false)} title="Nuevo gasto fijo">
         <div className="flex flex-col gap-3">
           <div>
             <label className="font-dm-sans text-[12px] text-text-tertiary block mb-2">Sugeridos</label>
@@ -180,7 +176,7 @@ export default function PresupuestosPage() {
             </div>
           </div>
           <div>
-            <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Presupuesto</label>
+            <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Monto</label>
             <input type="number" value={newBudget} onChange={(e) => setNewBudget(e.target.value)} placeholder="0" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
           </div>
           <Button className="w-full" disabled={!newName.trim()} onClick={addCategory}>
@@ -190,7 +186,7 @@ export default function PresupuestosPage() {
       </Dialog>
 
       <div className="py-4 px-4 rounded-btn bg-surface-1 border border-surface-2 mb-6 flex justify-between items-center">
-        <span className="font-dm-sans text-[15px] text-text-primary font-medium">Total</span>
+        <span className="font-dm-sans text-[15px] text-text-primary font-medium">Total gastos fijos</span>
         <span className="font-syne text-[20px] font-medium text-text-primary">{formatCurrency(total)}</span>
       </div>
 

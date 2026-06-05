@@ -73,7 +73,7 @@ export default function FinanzasPage() {
 
       {alertCategory && (
         <AlertBanner variant="warning" className="mb-6">
-          {alertCategory.name} está al {Math.round((alertCategory.spent / alertCategory.budget) * 100)}% del presupuesto
+          {alertCategory.name} está al {Math.round((alertCategory.spent / alertCategory.budget) * 100)}% del gasto fijo
         </AlertBanner>
       )}
 
@@ -109,7 +109,7 @@ export default function FinanzasPage() {
 
       <Card>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-syne text-[18px] font-medium text-text-primary">Presupuesto por categoría</h2>
+          <h2 className="font-syne text-[18px] font-medium text-text-primary">Gastos fijos</h2>
           <Link href="/finanzas/presupuestos" className="text-green text-[13px] font-dm-sans font-medium flex items-center gap-1">
             Editar <IconArrowRight size={14} />
           </Link>
@@ -135,7 +135,7 @@ export default function FinanzasPage() {
             })}
           </div>
         ) : (
-          <p className="font-dm-sans text-[13px] text-text-tertiary text-center py-4">No hay presupuestos este mes.</p>
+          <p className="font-dm-sans text-[13px] text-text-tertiary text-center py-4">No hay gastos fijos este mes.</p>
         )}
         <Link href="/finanzas/historial" className="block text-center text-green text-[13px] font-dm-sans font-medium mt-4 pt-4 border-t border-surface-2">
           Ver historial completo

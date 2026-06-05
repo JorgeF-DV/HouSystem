@@ -71,7 +71,7 @@ export default function DashboardPage() {
       {/* Alert */}
       {alertCategory && (
         <AlertBanner variant="warning" className="mb-6" actionLabel="Ver finanzas" onAction={() => router.push("/finanzas")}>
-          {alertCategory.name} está al {Math.round((alertCategory.spent / alertCategory.budget) * 100)}% del presupuesto
+          {alertCategory.name} está al {Math.round((alertCategory.spent / alertCategory.budget) * 100)}% del gasto fijo
         </AlertBanner>
       )}
 
@@ -122,7 +122,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <p className="font-dm-sans text-[13px] text-text-tertiary text-center py-4">
-            No hay presupuestos configurados este mes.
+            No hay gastos fijos configurados este mes.
           </p>
         )}
       </Card>
