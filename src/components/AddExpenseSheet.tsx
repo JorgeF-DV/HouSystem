@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BottomSheet } from "@/components/ui/BottomSheet";
+import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
@@ -49,16 +49,16 @@ export function AddExpenseSheet({ open, onClose, categories, members, onSaved }:
   };
 
   return (
-    <BottomSheet open={open} onClose={reset} title="Nuevo gasto">
-      <div className="flex flex-col gap-4 py-4">
+    <Dialog open={open} onClose={reset} title="Nuevo gasto">
+      <div className="flex flex-col gap-3">
         <Input label="Monto" type="number" placeholder="$0" value={amount} onChange={(e) => { setAmount(e.target.value); setErrors({}); }} error={errors.amount} />
         <Input label="Descripción" placeholder="¿En qué gastaron?" value={desc} onChange={(e) => setDesc(e.target.value)} />
         <div>
           <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">Categoría</label>
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex flex-wrap gap-1.5">
             {categories.map((c) => (
               <button key={c.name} onClick={() => { setCat(c.name); setErrors({}); }}
-                className={`whitespace-nowrap px-4 py-2 rounded-pill text-[13px] font-dm-sans transition-colors ${cat === c.name ? "bg-green text-black" : "bg-surface-2 text-text-secondary hover:bg-surface-3"}`}>
+                className={`whitespace-nowrap px-3 py-1.5 rounded-pill text-[12px] font-dm-sans transition-colors ${cat === c.name ? "bg-green text-black" : "bg-surface-2 text-text-secondary hover:bg-surface-3"}`}>
                 {c.icon} {c.name}
               </button>
             ))}
@@ -67,18 +67,18 @@ export function AddExpenseSheet({ open, onClose, categories, members, onSaved }:
         </div>
         <div>
           <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">¿Quién pagó?</label>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             {members.map((m) => (
               <button key={m.id} onClick={() => { setWho(m.id); setErrors({}); }}
-                className={`flex-1 py-3 rounded-btn border text-[13px] font-dm-sans transition-colors ${who === m.id ? "border-jorge text-jorge bg-jorge/10" : "border-surface-2 text-text-secondary"}`}>
+                className={`flex-1 py-2 rounded-btn border text-[13px] font-dm-sans transition-colors ${who === m.id ? "border-jorge text-jorge bg-jorge/10" : "border-surface-2 text-text-secondary"}`}>
                 {m.name || m.role}
               </button>
             ))}
           </div>
           {errors.who && <span className="text-coral text-[12px] font-dm-sans">{errors.who}</span>}
         </div>
-        <Button className="w-full mt-2" loading={saving} onClick={submit}>Guardar</Button>
+        <Button className="w-full mt-1" loading={saving} onClick={submit}>Guardar</Button>
       </div>
-    </BottomSheet>
+    </Dialog>
   );
 }

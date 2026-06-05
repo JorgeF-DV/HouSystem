@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { StatusPill } from "@/components/ui/StatusPill";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { BottomSheet } from "@/components/ui/BottomSheet";
+import { Dialog } from "@/components/ui/Dialog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { IconPlus, IconSettings, IconCalendarEvent, IconHeart } from "@tabler/icons-react";
 
@@ -174,15 +174,15 @@ export default function PlanesPage() {
         </div>
       )}
 
-      <BottomSheet open={sheetOpen} onClose={() => { setSheetOpen(false); setErrors({}); }} title="Nuevo evento">
-        <div className="flex flex-col gap-4 py-4">
+      <Dialog open={sheetOpen} onClose={() => { setSheetOpen(false); setErrors({}); }} title="Nuevo evento">
+        <div className="flex flex-col gap-3">
           <Input label="Nombre" value={eventName} onChange={(e) => { setEventName(e.target.value); setErrors({}); }} placeholder="Ej: Cena en La Cabrera" error={errors.name} />
           <Input label="Fecha" type="date" value={eventDate} onChange={(e) => { setEventDate(e.target.value); setErrors({}); }} error={errors.date} />
           <Input label="Hora (opcional)" type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} />
           <Input label="Lugar (opcional)" value={eventLocation} onChange={(e) => setEventLocation(e.target.value)} placeholder="Dirección o nombre del lugar" />
-          <Button className="w-full mt-2" loading={saving} onClick={createEvent}>Crear evento</Button>
+          <Button className="w-full mt-1" loading={saving} onClick={createEvent}>Crear evento</Button>
         </div>
-      </BottomSheet>
+      </Dialog>
     </div>
   );
 }

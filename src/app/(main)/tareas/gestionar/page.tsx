@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { BottomSheet } from "@/components/ui/BottomSheet";
+import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { IconArrowLeft, IconEdit, IconTrash } from "@tabler/icons-react";
@@ -114,25 +114,25 @@ export default function GestionarTareasPage() {
 
       <Button variant="secondary" className="w-full" onClick={openNew}>Agregar tarea</Button>
 
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)} title={editingId !== null ? "Editar tarea" : "Nueva tarea"}>
-        <div className="flex flex-col gap-4 py-4">
+      <Dialog open={sheetOpen} onClose={() => setSheetOpen(false)} title={editingId !== null ? "Editar tarea" : "Nueva tarea"}>
+        <div className="flex flex-col gap-3">
           <Input label="Nombre" value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre de la tarea" error={errors.name} />
           <Input label="Duración estimada" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="30 min" error={errors.duration} />
           <div>
             <label className="text-text-secondary text-[13px] font-dm-sans font-medium block mb-2">Frecuencia</label>
             <div className="flex gap-2">
               {["única", "semanal", "mensual"].map((f) => (
-                <button key={f} onClick={() => setFrequency(f)} aria-pressed={frequency === f} className={`flex-1 py-3 rounded-btn border text-[13px] font-dm-sans transition-colors ${frequency === f ? "border-green text-green bg-green/10" : "border-surface-2 text-text-secondary"}`}>
+                <button key={f} onClick={() => setFrequency(f)} aria-pressed={frequency === f} className={`flex-1 py-2 rounded-btn border text-[13px] font-dm-sans transition-colors ${frequency === f ? "border-green text-green bg-green/10" : "border-surface-2 text-text-secondary"}`}>
                   {f.charAt(0).toUpperCase() + f.slice(1)}
                 </button>
               ))}
             </div>
           </div>
-          <Button className="w-full mt-2" loading={saving} onClick={handleSave}>
+          <Button className="w-full mt-1" loading={saving} onClick={handleSave}>
             {editingId !== null ? "Guardar cambios" : "Agregar tarea"}
           </Button>
         </div>
-      </BottomSheet>
+      </Dialog>
     </div>
   );
 }

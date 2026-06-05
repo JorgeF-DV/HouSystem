@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCurrency } from "@/lib/utils";
-import { IconArrowLeft, IconTrash, IconPlus, IconX } from "@tabler/icons-react";
+import { IconArrowLeft, IconTrash, IconPlus } from "@tabler/icons-react";
 
 type BudgetCat = { id: string; name: string; icon: string; budget: number };
 
@@ -130,43 +131,35 @@ export default function PresupuestosPage() {
         </p>
       )}
 
-      {showNew ? (
-        <div className="mb-6 p-4 rounded-btn bg-surface-1 border border-surface-2">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-dm-sans text-[13px] text-text-secondary font-medium">Nueva categoría</span>
-            <button onClick={() => setShowNew(false)} className="p-1 hover:bg-surface-2 rounded-btn transition-colors text-text-tertiary">
-              <IconX size={16} />
-            </button>
+      <button onClick={() => setShowNew(true)} className="w-full mb-6 py-3 px-4 rounded-btn border-2 border-dashed border-surface-3 text-text-tertiary hover:text-text-secondary hover:border-text-tertiary transition-colors flex items-center justify-center gap-2 font-dm-sans text-[13px]">
+        <IconPlus size={16} /> Agregar categoría
+      </button>
+
+      <Dialog open={showNew} onClose={() => setShowNew(false)} title="Nueva categoría">
+        <div className="flex flex-col gap-3">
+          <div>
+            <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Nombre</label>
+            <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Ej: Alquiler" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
           </div>
-          <div className="space-y-3">
-            <div>
-              <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Nombre</label>
-              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Ej: Alquiler" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
+          <div>
+            <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Icono</label>
+            <div className="flex gap-2 flex-wrap">
+              {ICONS.map((ic) => (
+                <button key={ic} onClick={() => setNewIcon(ic)} className={`w-9 h-9 flex items-center justify-center rounded-btn text-lg transition-colors ${newIcon === ic ? "bg-green text-black" : "bg-surface-2 hover:bg-surface-3"}`}>
+                  {ic}
+                </button>
+              ))}
             </div>
-            <div>
-              <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Icono</label>
-              <div className="flex gap-2 flex-wrap">
-                {ICONS.map((ic) => (
-                  <button key={ic} onClick={() => setNewIcon(ic)} className={`w-9 h-9 flex items-center justify-center rounded-btn text-lg transition-colors ${newIcon === ic ? "bg-green text-black" : "bg-surface-2 hover:bg-surface-3"}`}>
-                    {ic}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Presupuesto</label>
-              <input type="number" value={newBudget} onChange={(e) => setNewBudget(e.target.value)} placeholder="0" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
-            </div>
-            <Button className="w-full" disabled={!newName.trim()} onClick={addCategory}>
-              Agregar
-            </Button>
           </div>
+          <div>
+            <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Presupuesto</label>
+            <input type="number" value={newBudget} onChange={(e) => setNewBudget(e.target.value)} placeholder="0" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
+          </div>
+          <Button className="w-full" disabled={!newName.trim()} onClick={addCategory}>
+            Agregar
+          </Button>
         </div>
-      ) : (
-        <button onClick={() => setShowNew(true)} className="w-full mb-6 py-3 px-4 rounded-btn border-2 border-dashed border-surface-3 text-text-tertiary hover:text-text-secondary hover:border-text-tertiary transition-colors flex items-center justify-center gap-2 font-dm-sans text-[13px]">
-          <IconPlus size={16} /> Agregar categoría
-        </button>
-      )}
+      </Dialog>
 
       <div className="py-4 px-4 rounded-btn bg-surface-1 border border-surface-2 mb-6 flex justify-between items-center">
         <span className="font-dm-sans text-[15px] text-text-primary font-medium">Total</span>
