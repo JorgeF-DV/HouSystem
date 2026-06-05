@@ -2,12 +2,11 @@ import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
-import { getRouteId } from "@/lib/utils";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requirePartnerAuth();
-    const goalId = getRouteId(new URL(req.url));
+    const { id: goalId } = await params;
 
     const goal = await prisma.goal.findFirst({ where: { id: goalId, partnerId: user.partnerId } });
     if (!goal) return apiError("Meta no encontrada", 404);
@@ -24,10 +23,10 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requirePartnerAuth();
-    const goalId = getRouteId(new URL(req.url));
+    const { id: goalId } = await params;
 
     const goal = await prisma.goal.findFirst({ where: { id: goalId, partnerId: user.partnerId } });
     if (!goal) return apiError("Meta no encontrada", 404);
