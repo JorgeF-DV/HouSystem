@@ -33,7 +33,6 @@ export default function FinanzasPage() {
   const [members, setMembers] = useState<{ id: string; name: string; role: string }[]>([]);
 
   const refetch = useCallback(async () => {
-    setLoading(true);
     try {
       const r = await fetch(`/api/finances?month=${monthIndex}&year=${year}`);
       const d = await r.json();
