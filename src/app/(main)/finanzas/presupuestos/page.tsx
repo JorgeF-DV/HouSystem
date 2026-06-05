@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { formatCurrency } from "@/lib/utils";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { IconArrowLeft, IconTrash, IconPlus, IconX } from "@tabler/icons-react";
 
-type BudgetCat = { name: string; icon: string; budget: number };
+type BudgetCat = { id: string; name: string; icon: string; budget: number };
+
+const ICONS = ["🏠", "🍽️", "🛒", "🚗", "💡", "🎮", "🏋️", "👕", "📚", "🐾", "✈️", "💰"];
 
 export default function PresupuestosPage() {
   const router = useRouter();
@@ -17,7 +19,12 @@ export default function PresupuestosPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<number, string>>({});
+  const [showNew, setShowNew] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newIcon, setNewIcon] = useState("🍽️");
+  const [newBudget, setNewBudget] = useState("");
 
   useEffect(() => {
     fetch("/api/budgets")
@@ -40,16 +47,44 @@ export default function PresupuestosPage() {
     setDirty(true);
   };
 
+  const deleteCategory = async (i: number) => {
+    const cat = budgets[i];
+    if (cat.id.startsWith("new_")) {
+      setBudgets((prev) => prev.filter((_, idx) => idx !== i));
+      if (budgets.length === 1) setDirty(false);
+      return;
+    }
+    setDeleting(cat.id);
+    try {
+      await fetch(`/api/budgets/${cat.id}`, { method: "DELETE" });
+      setBudgets((prev) => prev.filter((_, idx) => idx !== i));
+      if (budgets.length === 1) setDirty(false);
+    } catch {} finally { setDeleting(null); }
+  };
+
+  const addCategory = () => {
+    if (!newName.trim()) return;
+    setBudgets((prev) => [...prev, { id: `new_${Date.now()}`, name: newName.trim(), icon: newIcon, budget: Number(newBudget) || 0 }]);
+    setShowNew(false);
+    setNewName("");
+    setNewIcon("🍽️");
+    setNewBudget("");
+    setDirty(true);
+  };
+
   const save = async () => {
     setSaving(true);
     try {
       const r = await fetch("/api/budgets", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categories: budgets }),
+        body: JSON.stringify({ categories: budgets.map(({ name, icon, budget }) => ({ name, icon, budget })) }),
       });
       const d = await r.json();
-      if (!d.error) setDirty(false);
+      if (!d.error) {
+        setBudgets(d.budgets);
+        setDirty(false);
+      }
     } catch {} finally { setSaving(false); }
   };
 
@@ -71,18 +106,21 @@ export default function PresupuestosPage() {
       </p>
 
       {budgets.length > 0 ? (
-        <div className="flex flex-col gap-3 mb-8">
+        <div className="flex flex-col gap-3 mb-6">
           {budgets.map((cat, i) => (
-            <div key={cat.name} className="flex items-center gap-4 py-3 px-4 rounded-btn bg-surface-1 border border-surface-2">
-              <span className="text-lg">{cat.icon}</span>
-              <span className="font-dm-sans text-[15px] text-text-secondary flex-1">{cat.name}</span>
+            <div key={cat.id} className="flex items-center gap-2 py-3 px-4 rounded-btn bg-surface-1 border border-surface-2">
+              <span className="text-lg shrink-0">{cat.icon}</span>
+              <span className="font-dm-sans text-[15px] text-text-secondary flex-1 truncate">{cat.name}</span>
               <div className="flex items-center gap-1">
                 <span className="font-dm-sans text-[12px] text-text-tertiary">$</span>
                 <div className="flex flex-col items-end">
-                  <input type="number" value={cat.budget} onChange={(e) => updateBudget(i, e.target.value)} className="w-24 text-right bg-transparent text-text-primary font-dm-sans text-[15px] outline-none" />
+                  <input type="number" value={cat.budget} onChange={(e) => updateBudget(i, e.target.value)} className="w-20 text-right bg-transparent text-text-primary font-dm-sans text-[15px] outline-none" />
                   {errors[i] && <span className="text-coral text-[11px] font-dm-sans">{errors[i]}</span>}
                 </div>
               </div>
+              <button onClick={() => deleteCategory(i)} disabled={deleting === cat.id} className="p-1.5 hover:bg-surface-2 rounded-btn transition-colors text-text-tertiary hover:text-coral shrink-0">
+                {deleting === cat.id ? <span className="block w-4 h-4 border-2 border-coral border-t-transparent rounded-full animate-spin" /> : <IconTrash size={16} />}
+              </button>
             </div>
           ))}
         </div>
@@ -90,6 +128,44 @@ export default function PresupuestosPage() {
         <p className="font-dm-sans text-[13px] text-text-tertiary text-center py-8 mb-4">
           No hay presupuestos configurados.
         </p>
+      )}
+
+      {showNew ? (
+        <div className="mb-6 p-4 rounded-btn bg-surface-1 border border-surface-2">
+          <div className="flex items-center justify-between mb-4">
+            <span className="font-dm-sans text-[13px] text-text-secondary font-medium">Nueva categoría</span>
+            <button onClick={() => setShowNew(false)} className="p-1 hover:bg-surface-2 rounded-btn transition-colors text-text-tertiary">
+              <IconX size={16} />
+            </button>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Nombre</label>
+              <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Ej: Alquiler" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
+            </div>
+            <div>
+              <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Icono</label>
+              <div className="flex gap-2 flex-wrap">
+                {ICONS.map((ic) => (
+                  <button key={ic} onClick={() => setNewIcon(ic)} className={`w-9 h-9 flex items-center justify-center rounded-btn text-lg transition-colors ${newIcon === ic ? "bg-green text-black" : "bg-surface-2 hover:bg-surface-3"}`}>
+                    {ic}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="font-dm-sans text-[12px] text-text-tertiary block mb-1">Presupuesto</label>
+              <input type="number" value={newBudget} onChange={(e) => setNewBudget(e.target.value)} placeholder="0" className="w-full h-10 px-3 rounded-btn bg-surface-2 text-text-primary font-dm-sans text-[14px] outline-none placeholder:text-text-tertiary" />
+            </div>
+            <Button className="w-full" disabled={!newName.trim()} onClick={addCategory}>
+              Agregar
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <button onClick={() => setShowNew(true)} className="w-full mb-6 py-3 px-4 rounded-btn border-2 border-dashed border-surface-3 text-text-tertiary hover:text-text-secondary hover:border-text-tertiary transition-colors flex items-center justify-center gap-2 font-dm-sans text-[13px]">
+          <IconPlus size={16} /> Agregar categoría
+        </button>
       )}
 
       <div className="py-4 px-4 rounded-btn bg-surface-1 border border-surface-2 mb-6 flex justify-between items-center">

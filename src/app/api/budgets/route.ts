@@ -46,7 +46,11 @@ export async function PUT(req: NextRequest) {
       )
     );
 
-    return apiSuccess({ message: "Presupuestos guardados" });
+    const budgets = await prisma.budgetCategory.findMany({
+      where: { partnerId, month: m, year: y },
+    });
+
+    return apiSuccess({ budgets });
   } catch (error) {
     return handleApiError(error, "budgets");
   }
