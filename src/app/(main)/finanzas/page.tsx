@@ -31,6 +31,7 @@ export default function FinanzasPage() {
   const [data, setData] = useState<FinancesData | null>(null);
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<{ id: string; name: string; role: string }[]>([]);
+  const [incomeTotal, setIncomeTotal] = useState(0);
 
   const refetch = useCallback(async () => {
     try {
@@ -39,6 +40,11 @@ export default function FinanzasPage() {
       if (d.error) { router.push("/login"); return; }
       setData(d);
       setMembers(d.perMember.map((m: MemberInfo) => ({ id: m.userId, name: m.name, role: m.role })));
+      try {
+        const ri = await fetch("/api/incomes");
+        const di = await ri.json();
+        if (!di.error) setIncomeTotal(di.total);
+      } catch {}
     } catch {} finally { setLoading(false); }
   }, [monthIndex, year, router]);
 
@@ -93,6 +99,27 @@ export default function FinanzasPage() {
           </Card>
         ))}
       </div>
+
+      <Card className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-syne text-[18px] font-medium text-text-primary">Ingresos</h2>
+          <Link href="/finanzas/ingresos" className="text-green text-[13px] font-dm-sans font-medium flex items-center gap-1">
+            Ver más <IconArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="font-dm-sans text-[12px] text-text-tertiary mb-1">Ingresos del mes</p>
+            <p className="font-syne text-[20px] font-medium text-green">{formatCurrency(incomeTotal)}</p>
+          </div>
+          <div>
+            <p className="font-dm-sans text-[12px] text-text-tertiary mb-1">Balance</p>
+            <p className={`font-syne text-[20px] font-medium ${incomeTotal - total >= 0 ? "text-green" : "text-coral"}`}>
+              {formatCurrency(incomeTotal - total)}
+            </p>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mb-6">
         <h2 className="font-syne text-[18px] font-medium text-text-primary mb-3">Gasto Total</h2>

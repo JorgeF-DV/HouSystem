@@ -47,6 +47,7 @@ model User {
   assignedTasks          Task[]             @relation("TaskAssignee")
   createdEvents          Event[]            @relation("EventCreator")
   paidExpenses           Expense[]
+  registeredIncomes      Income[]
   preferences            UserPreferences?
   settings               UserSettings?
   notifications          Notification[]
@@ -64,6 +65,7 @@ model Partner {
   users    User[]             @relation("PartnerUsers")
   budgets  BudgetCategory[]
   expenses Expense[]
+  incomes  Income[]
   goals    Goal[]
   tasks    Task[]
   events   Event[]
@@ -113,6 +115,20 @@ model Expense {
   paidBy  User     @relation(fields: [paidById], references: [id])
 
   @@map("expenses")
+}
+
+model Income {
+  id              String   @id @default(uuid())
+  partnerId       String
+  amount          Int
+  description     String
+  registeredById  String
+  date            DateTime @default(now())
+
+  partner    Partner @relation(fields: [partnerId], references: [id])
+  registeredBy User   @relation(fields: [registeredById], references: [id])
+
+  @@map("incomes")
 }
 
 model Goal {

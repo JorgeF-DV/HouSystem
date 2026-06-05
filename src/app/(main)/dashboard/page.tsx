@@ -28,6 +28,7 @@ type DashboardData = {
   tasks: { available: number; inProgress: number; completed: number; total: number };
   todayExpenses: { id: string; amount: number; description: string; categoryName: string; paidById: string; date: string }[];
   nextEvent: { name: string; date: string; time?: string } | null;
+  totalIncome: number;
 };
 
 export default function DashboardPage() {
@@ -53,7 +54,8 @@ export default function DashboardPage() {
   if (loading) return <DashboardSkeleton />;
   if (!data) return null;
 
-  const { budgetSummary, tasks, todayExpenses, nextEvent } = data;
+  const { budgetSummary, tasks, todayExpenses, nextEvent, totalIncome } = data;
+  const balance = totalIncome - budgetSummary.totalSpent;
   const alertCategory = budgetSummary.categories.find((c) => (c.spent / c.budget) * 100 >= 90);
 
   return (
@@ -125,6 +127,28 @@ export default function DashboardPage() {
             No hay gastos fijos configurados este mes.
           </p>
         )}
+      </Card>
+
+      {/* Ingresos */}
+      <Card className="mb-4 md:col-span-full">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-syne text-[18px] font-medium text-text-primary">Ingresos del mes</h2>
+          <Link href="/finanzas/ingresos" className="text-green text-[13px] font-dm-sans font-medium flex items-center gap-1">
+            Ver más <IconArrowRight size={14} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="font-dm-sans text-[12px] text-text-tertiary mb-1">Ingresos</p>
+            <p className="font-syne text-[20px] font-medium text-green">{formatCurrency(totalIncome)}</p>
+          </div>
+          <div>
+            <p className="font-dm-sans text-[12px] text-text-tertiary mb-1">Balance</p>
+            <p className={`font-syne text-[20px] font-medium ${balance >= 0 ? "text-green" : "text-coral"}`}>
+              {formatCurrency(balance)}
+            </p>
+          </div>
+        </div>
       </Card>
 
       {/* Grid 2 cols */}
