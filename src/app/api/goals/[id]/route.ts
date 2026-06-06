@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import type { Prisma } from "@/generated/prisma/client";
 import { getRouteId } from "@/lib/utils";
+import { getOwnedResource } from "@/lib/db-utils";
 
 type GoalWithContribs = Prisma.GoalGetPayload<{ include: { contributions: { include: { contributedBy: { select: { id: true; name: true; role: true } } } } } }>;
 
@@ -33,8 +34,7 @@ export async function PUT(req: NextRequest) {
 
     const { name, price, platform, link } = await req.json();
 
-    const goal = await prisma.goal.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!goal) return apiError("Meta no encontrada", 404);
+    await getOwnedResource(prisma.goal, id, user.partnerId);
 
     await prisma.goal.update({
       where: { id },
@@ -52,8 +52,7 @@ export async function DELETE(req: Request) {
     const user = await requirePartnerAuth();
     const id = getRouteId(new URL(req.url));
 
-    const goal = await prisma.goal.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!goal) return apiError("Meta no encontrada", 404);
+    await getOwnedResource(prisma.goal, id, user.partnerId);
 
     await prisma.goal.delete({ where: { id } });
     return apiSuccess({ message: "Meta eliminada" });

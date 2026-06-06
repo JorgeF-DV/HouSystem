@@ -3,6 +3,7 @@ import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import { getRouteId } from "@/lib/utils";
+import { getOwnedResource } from "@/lib/db-utils";
 
 export async function GET(req: Request) {
   try {
@@ -29,8 +30,7 @@ export async function PUT(req: NextRequest) {
 
     const { name, date, time, location, price, description } = await req.json();
 
-    const event = await prisma.event.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!event) return apiError("Evento no encontrado", 404);
+    await getOwnedResource(prisma.event, id, user.partnerId);
 
     await prisma.event.update({ where: { id }, data: { name, date, time, location, price, description } });
 
@@ -45,8 +45,7 @@ export async function DELETE(req: Request) {
     const user = await requirePartnerAuth();
     const id = getRouteId(new URL(req.url));
 
-    const event = await prisma.event.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!event) return apiError("Evento no encontrado", 404);
+    await getOwnedResource(prisma.event, id, user.partnerId);
 
     await prisma.event.delete({ where: { id } });
     return apiSuccess({ message: "Evento eliminado" });

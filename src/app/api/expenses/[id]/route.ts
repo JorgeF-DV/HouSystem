@@ -3,14 +3,14 @@ import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import { getRouteId } from "@/lib/utils";
+import { getOwnedResource } from "@/lib/db-utils";
 
 export async function PUT(req: NextRequest) {
   try {
     const user = await requirePartnerAuth();
     const id = getRouteId(new URL(req.url));
 
-    const expense = await prisma.expense.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!expense) return apiError("Gasto no encontrado", 404);
+    const expense = await getOwnedResource(prisma.expense, id, user.partnerId);
 
     const { amount, description, categoryName } = await req.json();
     await prisma.expense.update({
@@ -29,8 +29,7 @@ export async function DELETE(req: Request) {
     const user = await requirePartnerAuth();
     const id = getRouteId(new URL(req.url));
 
-    const expense = await prisma.expense.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!expense) return apiError("Gasto no encontrado", 404);
+    await getOwnedResource(prisma.expense, id, user.partnerId);
 
     await prisma.expense.delete({ where: { id } });
 

@@ -3,6 +3,7 @@ import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import { getWeekStart } from "@/lib/utils";
+import { getOwnedResource } from "@/lib/db-utils";
 
 type TaskWithAssignee = Awaited<ReturnType<typeof prisma.task.findMany>>[number];
 
@@ -65,8 +66,7 @@ export async function PUT(req: NextRequest) {
     if (!id) return apiError("ID de tarea requerido");
 
     const { name, duration, frequency } = await req.json();
-    const task = await prisma.task.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!task) return apiError("Tarea no encontrada", 404);
+    await getOwnedResource(prisma.task, id, user.partnerId);
 
     await prisma.task.update({ where: { id }, data: { name, duration, frequency } });
     return apiSuccess({ message: "Tarea actualizada" });
@@ -83,8 +83,7 @@ export async function DELETE(req: Request) {
     const id = url.searchParams.get("id");
     if (!id) return apiError("ID de tarea requerido");
 
-    const task = await prisma.task.findFirst({ where: { id, partnerId: user.partnerId } });
-    if (!task) return apiError("Tarea no encontrada", 404);
+    await getOwnedResource(prisma.task, id, user.partnerId);
 
     await prisma.task.delete({ where: { id } });
     return apiSuccess({ message: "Tarea eliminada" });
