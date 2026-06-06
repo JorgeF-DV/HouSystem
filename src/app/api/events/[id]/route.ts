@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import { getRouteId } from "@/lib/utils";
 import { getOwnedResource } from "@/lib/db-utils";
+import type { EventDetailResponse, MessageResponse } from "@/types/api";
 
 export async function GET(req: Request) {
   try {
@@ -17,7 +18,7 @@ export async function GET(req: Request) {
 
     if (!event) return apiError("Evento no encontrado", 404);
 
-    return apiSuccess({ event });
+    return apiSuccess<EventDetailResponse>({ event });
   } catch (error) {
     return handleApiError(error, "events/[id]");
   }
@@ -34,7 +35,7 @@ export async function PUT(req: NextRequest) {
 
     await prisma.event.update({ where: { id }, data: { name, date, time, location, price, description } });
 
-    return apiSuccess({ message: "Evento actualizado" });
+    return apiSuccess<MessageResponse>({ message: "Evento actualizado" });
   } catch (error) {
     return handleApiError(error, "events/[id]");
   }
@@ -48,7 +49,7 @@ export async function DELETE(req: Request) {
     await getOwnedResource(prisma.event, id, user.partnerId);
 
     await prisma.event.delete({ where: { id } });
-    return apiSuccess({ message: "Evento eliminado" });
+    return apiSuccess<MessageResponse>({ message: "Evento eliminado" });
   } catch (error) {
     return handleApiError(error, "events/[id]");
   }

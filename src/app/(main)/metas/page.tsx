@@ -28,7 +28,7 @@ export default function MetasPage() {
         if (d.error) { router.push("/login"); return; }
         setGoals(d.goals ?? []);
       })
-      .catch(() => {})
+      .catch((e) => console.error("[MetasPage]", e))
       .finally(() => setLoading(false));
   }, [router]);
 

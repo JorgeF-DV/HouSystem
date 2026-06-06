@@ -47,7 +47,8 @@ export default function RegisterPage() {
         return;
       }
       router.push("/link-partner");
-    } catch {
+    } catch (e) {
+      console.error("[RegisterPage]", e);
       setServerError("Error de conexión");
     } finally {
       setLoading(false);

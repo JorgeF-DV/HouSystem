@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { MessageResponse } from "@/types/api";
 import { getRouteId } from "@/lib/utils";
 import { getOwnedResource } from "@/lib/db-utils";
 
@@ -18,7 +19,7 @@ export async function PUT(req: NextRequest) {
       data: { amount: amount ?? expense.amount, description: description ?? expense.description, categoryName: categoryName ?? expense.categoryName },
     });
 
-    return apiSuccess({ message: "Gasto actualizado" });
+    return apiSuccess<MessageResponse>({ message: "Gasto actualizado" });
   } catch (error) {
     return handleApiError(error, "expenses/[id]");
   }
@@ -33,7 +34,7 @@ export async function DELETE(req: Request) {
 
     await prisma.expense.delete({ where: { id } });
 
-    return apiSuccess({ message: "Gasto eliminado" });
+    return apiSuccess<MessageResponse>({ message: "Gasto eliminado" });
   } catch (error) {
     return handleApiError(error, "expenses/[id]");
   }

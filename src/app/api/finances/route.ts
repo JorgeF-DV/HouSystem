@@ -1,6 +1,7 @@
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import type { FinancesResumeResponse } from "@/types/api";
 
 type BudgetCat = Awaited<ReturnType<typeof prisma.budgetCategory.findMany>>[number];
 type ExpenseEntry = Awaited<ReturnType<typeof prisma.expense.findMany>>[number];
@@ -51,7 +52,7 @@ export async function GET(req: Request) {
       total: memberExpenses.find((e: { paidById: string; _sum: { amount: number | null } }) => e.paidById === m.id)?._sum.amount ?? 0,
     }));
 
-    return apiSuccess({ categories: categoriesWithSpent, perMember, total, month, year });
+    return apiSuccess<FinancesResumeResponse>({ categories: categoriesWithSpent, perMember, total, month, year });
   } catch (error) {
     return handleApiError(error, "finances");
   }

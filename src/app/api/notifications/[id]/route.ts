@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import { getRouteId } from "@/lib/utils";
+import type { MessageResponse } from "@/types/api";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.notification.update({ where: { id }, data: { unread: false } });
 
-    return apiSuccess({ message: "Notificación leída" });
+    return apiSuccess<MessageResponse>({ message: "Notificación leída" });
   } catch (error) {
     return handleApiError(error, "notifications/[id]");
   }

@@ -34,7 +34,7 @@ export default function IngresosPage() {
       if (d.error) { router.push("/login"); return; }
       setIncomes(d.incomes ?? []);
       setTotal(d.total ?? 0);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { console.error("[IngresosPage]", e); } finally { setLoading(false); }
   }, [router]);
 
   useEffect(() => { refetch(); }, [refetch]);
@@ -55,7 +55,7 @@ export default function IngresosPage() {
         setDesc("");
         refetch();
       }
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[IngresosPage/add]", e); } finally { setSaving(false); }
   };
 
   const deleteIncome = async (id: string) => {
@@ -63,7 +63,7 @@ export default function IngresosPage() {
     try {
       await fetch(`/api/incomes/${id}`, { method: "DELETE" });
       refetch();
-    } catch {} finally { setDeleting(null); }
+    } catch (e) { console.error("[IngresosPage/delete]", e); } finally { setDeleting(null); }
   };
 
   if (loading) return <IngresosSkeleton />;

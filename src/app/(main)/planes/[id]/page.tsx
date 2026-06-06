@@ -43,7 +43,7 @@ export default function EventoDetailPage({ params }: { params: Promise<{ id: str
         setEditTime(d.event.time ?? "");
         setEditLocation(d.event.location ?? "");
       })
-      .catch(() => {})
+      .catch((e) => console.error("[EventoDetail]", e))
       .finally(() => setLoading(false));
   }, [id, router]);
 
@@ -53,7 +53,7 @@ export default function EventoDetailPage({ params }: { params: Promise<{ id: str
       const r = await fetch(`/api/events/${id}`, { method: "DELETE" });
       const d = await r.json();
       if (!d.error) router.push("/planes");
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[EventoDetail/delete]", e); } finally { setSaving(false); }
   };
 
   const updateEvent = async () => {
@@ -69,7 +69,7 @@ export default function EventoDetailPage({ params }: { params: Promise<{ id: str
         setEditOpen(false);
         setEvent({ ...event!, name: editName.trim(), date: editDate, time: editTime || null, location: editLocation || null });
       }
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[EventoDetail/update]", e); } finally { setSaving(false); }
   };
 
   if (loading) return <EventSkeleton />;

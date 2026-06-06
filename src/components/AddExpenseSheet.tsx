@@ -45,7 +45,7 @@ export function AddExpenseSheet({ open, onClose, categories, members, onSaved }:
       });
       const d = await r.json();
       if (d.expense) { reset(); onSaved(); }
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[AddExpenseSheet]", e); } finally { setSaving(false); }
   };
 
   return (

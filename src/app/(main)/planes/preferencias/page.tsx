@@ -36,7 +36,7 @@ export default function PreferenciasPage() {
           setPriceRange(p.priceRange ?? "Hasta $50K");
         }
       })
-      .catch(() => {})
+      .catch((e) => console.error("[PreferenciasPage]", e))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -53,7 +53,7 @@ export default function PreferenciasPage() {
         body: JSON.stringify({ selectedCategories: selected, city, priceRange }),
       });
       router.push("/planes");
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[PreferenciasPage/save]", e); } finally { setSaving(false); }
   };
 
   if (loading) return <PrefsSkeleton />;

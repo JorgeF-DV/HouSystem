@@ -40,8 +40,8 @@ export default function FinanzasPage() {
       if (d.error) { router.push("/login"); return; }
       setData(d);
       setMembers(d.perMember.map((m: MemberInfo) => ({ id: m.userId, name: m.name, role: m.role })));
-    } catch {} finally { setLoading(false); }
-    fetch("/api/incomes").then((ri) => ri.json()).then((di) => { if (!di.error) setIncomeTotal(di.total); }).catch(() => {});
+    } catch (e) { console.error("[FinanzasPage]", e); } finally { setLoading(false); }
+    fetch("/api/incomes").then((ri) => ri.json()).then((di) => { if (!di.error) setIncomeTotal(di.total); }).catch((e) => console.error("[FinanzasPage/incomes]", e));
   }, [monthIndex, year, router]);
 
   useEffect(() => { refetch(); }, [refetch]);

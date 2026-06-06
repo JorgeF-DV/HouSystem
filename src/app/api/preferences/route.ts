@@ -2,8 +2,9 @@ import { NextRequest } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import type { PreferencesResponse, PreferencesUpdateResponse } from "@/types/api";
 
-const DEFAULT_PREFERENCES = { selectedCategories: [], city: "Buenos Aires", priceRange: "Hasta $50K" };
+const DEFAULT_PREFERENCES: { selectedCategories: string[]; city: string; priceRange: string } = { selectedCategories: [], city: "Buenos Aires", priceRange: "Hasta $50K" };
 
 export async function GET() {
   try {
@@ -11,7 +12,7 @@ export async function GET() {
 
     const preferences = await prisma.userPreferences.findUnique({ where: { userId: user.id } });
 
-    return apiSuccess({
+    return apiSuccess<PreferencesResponse>({
       preferences: preferences ?? DEFAULT_PREFERENCES,
     });
   } catch (error) {
@@ -31,7 +32,7 @@ export async function PUT(req: NextRequest) {
       update: { selectedCategories, city, priceRange },
     });
 
-    return apiSuccess({ preferences });
+    return apiSuccess<PreferencesUpdateResponse>({ preferences });
   } catch (error) {
     return handleApiError(error, "preferences");
   }

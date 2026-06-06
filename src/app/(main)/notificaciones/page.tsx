@@ -31,7 +31,7 @@ export default function NotificacionesPage() {
         const d = await r.json();
         if (d.error) { router.push("/login"); return; }
         setNotifications(d.notifications ?? []);
-      } catch {} finally { setLoading(false); }
+      } catch (e) { console.error("[NotificacionesPage]", e); } finally { setLoading(false); }
     })();
   }, [router]);
 
@@ -39,7 +39,7 @@ export default function NotificacionesPage() {
     try {
       await fetch("/api/notifications/read-all", { method: "POST" });
       setNotifications(notifications.map((n) => ({ ...n, unread: false })));
-    } catch {}
+    } catch (e) { console.error("[NotificacionesPage/markAll]", e); }
   };
 
   if (loading) return <NotifSkeleton />;

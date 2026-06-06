@@ -3,11 +3,12 @@ import { prisma } from "@/lib/db";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
 import type { BudgetCategory, Expense, Task } from "@/generated/prisma/client";
 import { getWeekStart } from "@/lib/utils";
+import type { DashboardResponse } from "@/types/api";
 
 export async function GET() {
   try {
     const user = await requireAuth();
-    if (!user.partnerId) return apiSuccess({ greeting: `Buen día, ${user.name}`, date: "", budgetSummary: { categories: [], totalSpent: 0, totalBudget: 0, percentUsed: 0 }, tasks: { available: 0, inProgress: 0, completed: 0, total: 0 }, todayExpenses: [], nextEvent: null });
+    if (!user.partnerId) return apiSuccess<DashboardResponse>({ greeting: `Buen día, ${user.name}`, date: "", budgetSummary: { categories: [], totalSpent: 0, totalBudget: 0, percentUsed: 0 }, tasks: { available: 0, inProgress: 0, completed: 0, total: 0 }, todayExpenses: [], nextEvent: null, totalIncome: 0 });
 
     const now = new Date();
     const month = now.getMonth();
@@ -74,7 +75,7 @@ export async function GET() {
         .reduce((sum: number, inc: { amount: number }) => sum + inc.amount, 0);
     } catch {}
 
-    return apiSuccess({
+    return apiSuccess<DashboardResponse>({
       greeting: `Buen día, ${user.name}`,
       date: todayStr,
       budgetSummary: { categories: categoriesWithSpent, totalSpent, totalBudget, percentUsed: totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0 },

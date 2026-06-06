@@ -1,10 +1,11 @@
 import { requireAuth } from "@/lib/auth";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import type { MessageResponse } from "@/types/api";
 
 export async function POST() {
   try {
     await requireAuth();
-    return apiSuccess({ message: "Export no implementado" });
+    return apiSuccess<MessageResponse>({ message: "Export no implementado" });
   } catch (error) {
     return handleApiError(error, "settings/export");
   }

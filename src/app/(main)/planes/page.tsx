@@ -44,7 +44,7 @@ export default function PlanesPage() {
       if (eData.error || rData.error) { router.push("/login"); return; }
       setEvents(eData.events ?? []);
       setRecommendations(rData.recommendations ?? []);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { console.error("[PlanesPage]", e); } finally { setLoading(false); }
   }, [router]);
 
   useEffect(() => { refetch(); }, [refetch]);
@@ -73,7 +73,7 @@ export default function PlanesPage() {
         setErrors({});
         refetch();
       }
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[PlanesPage/create]", e); } finally { setSaving(false); }
   };
 
   const agendar = async (recId: string) => {
@@ -82,7 +82,7 @@ export default function PlanesPage() {
       const r = await fetch(`/api/recommendations/${recId}/save`, { method: "POST" });
       const d = await r.json();
       if (d.event) refetch();
-    } catch {} finally { setSavingRec(null); }
+    } catch (e) { console.error("[PlanesPage/agendar]", e); } finally { setSavingRec(null); }
   };
 
   if (loading) return <PlanesSkeleton />;

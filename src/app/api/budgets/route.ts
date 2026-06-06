@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { BudgetsListResponse } from "@/types/api";
 
 export async function GET(req: Request) {
   try {
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
       where: { partnerId: user.partnerId, month, year },
     });
 
-    return apiSuccess({ budgets });
+    return apiSuccess<BudgetsListResponse>({ budgets });
   } catch (error) {
     return handleApiError(error, "budgets");
   }
@@ -50,7 +51,7 @@ export async function PUT(req: NextRequest) {
       where: { partnerId, month: m, year: y },
     });
 
-    return apiSuccess({ budgets });
+    return apiSuccess<BudgetsListResponse>({ budgets });
   } catch (error) {
     return handleApiError(error, "budgets");
   }

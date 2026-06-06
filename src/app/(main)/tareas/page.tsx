@@ -33,7 +33,7 @@ export default function TareasPage() {
         setAvailable(d.available ?? []);
         setInProgress(d.inProgress ?? []);
         setCompleted(d.completed ?? []);
-      } catch {} finally { setLoading(false); }
+      } catch (e) { console.error("[TareasPage]", e); } finally { setLoading(false); }
     })();
   }, [router]);
 
@@ -44,7 +44,7 @@ export default function TareasPage() {
       const r = await fetch("/api/tasks");
       const d = await r.json();
       if (!d.error) { setAvailable(d.available ?? []); setInProgress(d.inProgress ?? []); setCompleted(d.completed ?? []); }
-    } catch {} finally { setTaking(null); }
+    } catch (e) { console.error("[TareasPage/take]", e); } finally { setTaking(null); }
   };
 
   if (loading) return <TareasSkeleton />;

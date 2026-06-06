@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import type { PartnerStatusResponse } from "@/types/api";
 
 export async function GET() {
   try {
@@ -25,7 +26,7 @@ export async function GET() {
       partner = p;
     }
 
-    return apiSuccess({ invitation, partner });
+    return apiSuccess<PartnerStatusResponse>({ invitation, partner });
   } catch (error) {
     return handleApiError(error, "partner/status");
   }

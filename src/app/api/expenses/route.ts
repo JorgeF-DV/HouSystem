@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { ExpensesListResponse, ExpenseCreateResponse } from "@/types/api";
 
 type ExpenseEntry = Awaited<ReturnType<typeof prisma.expense.findMany>>[number];
 
@@ -31,7 +32,7 @@ export async function GET(req: Request) {
       grouped[day].push(exp);
     }
 
-    return apiSuccess({ expenses: grouped, total: filtered.reduce((s: number, e: ExpenseEntry) => s + e.amount, 0) });
+    return apiSuccess<ExpensesListResponse>({ expenses: grouped, total: filtered.reduce((s: number, e: ExpenseEntry) => s + e.amount, 0) });
   } catch (error) {
     return handleApiError(error, "expenses");
   }
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return apiSuccess({ expense }, 201);
+    return apiSuccess<ExpenseCreateResponse>({ expense }, 201);
   } catch (error) {
     return handleApiError(error, "expenses");
   }

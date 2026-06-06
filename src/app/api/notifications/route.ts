@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import type { NotificationsListResponse } from "@/types/api";
 
 export async function GET() {
   try {
@@ -12,7 +13,7 @@ export async function GET() {
       take: 50,
     });
 
-    return apiSuccess({ notifications });
+    return apiSuccess<NotificationsListResponse>({ notifications });
   } catch (error) {
     return handleApiError(error, "notifications");
   }

@@ -31,10 +31,8 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Public routes
-  const publicRoutes = ["/login", "/register", "/welcome", "/link-partner", "/accept-invite"];
-  const isPublicRoute = publicRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  );
+  const publicPaths = new Set(["/login", "/register", "/welcome", "/link-partner", "/accept-invite"]);
+  const isPublicRoute = publicPaths.has(request.nextUrl.pathname);
   const isApiAuthRoute = request.nextUrl.pathname.startsWith("/api/auth");
 
   if (!user && !isPublicRoute && !isApiAuthRoute) {

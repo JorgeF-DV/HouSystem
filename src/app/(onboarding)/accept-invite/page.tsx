@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { IconUsers } from "@tabler/icons-react";
 
 export default function AcceptInvitePage() {
@@ -20,7 +21,7 @@ export default function AcceptInvitePage() {
         if (d.invitation) setInvitation(d.invitation);
         else if (d.partner) router.push("/dashboard");
       })
-      .catch(() => {})
+      .catch((e) => console.error("[AcceptInvitePage]", e))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -36,7 +37,14 @@ export default function AcceptInvitePage() {
     finally { setAccepting(false); }
   };
 
-  if (loading) return null;
+  if (loading) return (
+    <div className="flex flex-col items-center text-center gap-6">
+      <Skeleton className="w-20 h-20 rounded-full" />
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-5 w-64" />
+      <Skeleton className="h-12 w-full" />
+    </div>
+  );
 
   return (
     <div className="flex flex-col items-center text-center gap-6">

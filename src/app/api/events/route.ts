@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { EventsListResponse, EventCreateResponse } from "@/types/api";
 
 export async function GET() {
   try {
@@ -12,7 +13,7 @@ export async function GET() {
       orderBy: { date: "asc" },
     });
 
-    return apiSuccess({ events });
+    return apiSuccess<EventsListResponse>({ events });
   } catch (error) {
     return handleApiError(error, "events");
   }
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return apiSuccess({ event }, 201);
+    return apiSuccess<EventCreateResponse>({ event }, 201);
   } catch (error) {
     return handleApiError(error, "events");
   }

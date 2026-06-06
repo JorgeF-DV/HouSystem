@@ -36,7 +36,8 @@ export default function LinkPartnerPage() {
         return;
       }
       setSent(true);
-    } catch {
+    } catch (e) {
+      console.error("[LinkPartnerPage]", e);
       setError("Error de conexión");
     } finally {
       setLoading(false);

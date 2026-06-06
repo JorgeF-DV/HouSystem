@@ -34,7 +34,7 @@ export default function AjustesPage() {
         setTheme(sData.settings?.theme ?? "Oscuro");
         setPreferences(pData.preferences ?? []);
       })
-      .catch(() => {})
+      .catch((e) => console.error("[AjustesPage]", e))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -42,13 +42,13 @@ export default function AjustesPage() {
     setTheme(t);
     setSavingTheme(true);
     try { await fetch("/api/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ theme: t }) }); }
-    catch {} finally { setSavingTheme(false); }
+    catch (e) { console.error("[AjustesPage/theme]", e); } finally { setSavingTheme(false); }
   };
 
   const togglePref = async (type: string, enabled: boolean) => {
     setPreferences(preferences.map((p) => p.type === type ? { ...p, enabled } : p));
     try { await fetch("/api/notifications/preferences", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type, enabled }) }); }
-    catch {}
+    catch (e) { console.error("[AjustesPage/pref]", e); }
   };
 
   if (loading) return <AjustesSkeleton />;

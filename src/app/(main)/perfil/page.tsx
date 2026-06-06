@@ -35,7 +35,7 @@ export default function PerfilPage() {
         setProfile(d);
         setNewName(d.name || "");
       })
-      .catch(() => {})
+      .catch((e) => console.error("[PerfilPage]", e))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -50,7 +50,7 @@ export default function PerfilPage() {
       });
       const d = await r.json();
       if (!d.error) { setEditingName(false); setProfile({ ...profile!, name: newName.trim() }); }
-    } catch {} finally { setSavingName(false); }
+    } catch (e) { console.error("[PerfilPage/update]", e); } finally { setSavingName(false); }
   };
 
   const handleUnlink = async () => {
@@ -60,7 +60,7 @@ export default function PerfilPage() {
       const r = await fetch("/api/partner/unlink", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
       const d = await r.json();
       if (!d.error) router.push("/link-partner");
-    } catch {} finally { setUnlinking(false); }
+    } catch (e) { console.error("[PerfilPage/unlink]", e); } finally { setUnlinking(false); }
   };
 
   const handleLogout = async () => {

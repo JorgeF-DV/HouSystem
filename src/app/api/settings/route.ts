@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import type { SettingsResponse, SettingsUpdateResponse, MessageResponse } from "@/types/api";
 
 const DEFAULT_THEME = "Oscuro";
 
@@ -11,7 +12,7 @@ export async function GET() {
 
     const settings = await prisma.userSettings.findUnique({ where: { userId: user.id } });
 
-    return apiSuccess({ settings: settings ?? { theme: DEFAULT_THEME } });
+    return apiSuccess<SettingsResponse>({ settings: settings ?? { theme: DEFAULT_THEME } });
   } catch (error) {
     return handleApiError(error, "settings");
   }
@@ -29,7 +30,7 @@ export async function PUT(req: NextRequest) {
       update: { theme },
     });
 
-    return apiSuccess({ settings });
+    return apiSuccess<SettingsUpdateResponse>({ settings });
   } catch (error) {
     return handleApiError(error, "settings");
   }

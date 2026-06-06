@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { LoginResponse } from "@/types/api";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     if (error) return apiError("Email o contraseña incorrectos", 401);
 
-    return apiSuccess({ user: data.user });
+    return apiSuccess<LoginResponse>({ user: data.user });
   } catch (error) {
     return handleApiError(error, "auth/login");
   }

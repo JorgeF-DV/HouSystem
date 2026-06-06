@@ -47,7 +47,7 @@ export default function PresupuestosPage() {
         if (d.error) { router.push("/login"); return; }
         setBudgets(d.budgets);
       })
-      .catch(() => {})
+      .catch((e) => console.error("[PresupuestosPage]", e))
       .finally(() => setLoading(false));
   }, [router]);
 
@@ -73,7 +73,7 @@ export default function PresupuestosPage() {
       await fetch(`/api/budgets/${cat.id}`, { method: "DELETE" });
       setBudgets((prev) => prev.filter((_, idx) => idx !== i));
       if (budgets.length === 1) setDirty(false);
-    } catch {} finally { setDeleting(null); }
+    } catch (e) { console.error("[PresupuestosPage/delete]", e); } finally { setDeleting(null); }
   };
 
   const addCategory = () => {
@@ -99,7 +99,7 @@ export default function PresupuestosPage() {
         setBudgets(d.budgets);
         setDirty(false);
       }
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[PresupuestosPage/save]", e); } finally { setSaving(false); }
   };
 
   const total = budgets.reduce((s, c) => s + c.budget, 0);

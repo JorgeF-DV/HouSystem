@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { MessageResponse } from "@/types/api";
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
       data: { senderId: user.id, receiverId: partner.id },
     });
 
-    return apiSuccess({ message: "Invitación enviada" });
+    return apiSuccess<MessageResponse>({ message: "Invitación enviada" });
   } catch (error) {
     return handleApiError(error, "partner/invite");
   }

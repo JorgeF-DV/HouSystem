@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { MessageResponse } from "@/types/api";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     await prisma.task.update({ where: { id }, data: { status: "available", assignedTo: null, completedAt: null } });
 
-    return apiSuccess({ message: "Tarea reabierta" });
+    return apiSuccess<MessageResponse>({ message: "Tarea reabierta" });
   } catch (error) {
     return handleApiError(error, "tasks/reopen");
   }

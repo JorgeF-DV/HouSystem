@@ -46,7 +46,7 @@ export default function AgregarMetaPage() {
       });
       const d = await r.json();
       if (d.goal) router.push("/metas");
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[AgregarMeta]", e); } finally { setSaving(false); }
   };
 
   return (

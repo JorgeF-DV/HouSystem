@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import type { NotificationPreferencesListResponse, MessageResponse } from "@/types/api";
 
 export async function GET() {
   try {
@@ -11,7 +12,7 @@ export async function GET() {
       where: { userId: user.id },
     });
 
-    return apiSuccess({ preferences });
+    return apiSuccess<NotificationPreferencesListResponse>({ preferences });
   } catch (error) {
     return handleApiError(error, "notifications/preferences");
   }
@@ -29,7 +30,7 @@ export async function PUT(req: NextRequest) {
       update: { enabled },
     });
 
-    return apiSuccess({ message: "Preferencia actualizada" });
+    return apiSuccess<MessageResponse>({ message: "Preferencia actualizada" });
   } catch (error) {
     return handleApiError(error, "notifications/preferences");
   }

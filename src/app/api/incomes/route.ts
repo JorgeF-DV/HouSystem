@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { IncomesListResponse, IncomeCreateResponse } from "@/types/api";
 
 export async function GET() {
   try {
@@ -15,7 +16,7 @@ export async function GET() {
 
     const total = incomes.reduce((s, e) => s + e.amount, 0);
 
-    return apiSuccess({ incomes, total });
+    return apiSuccess<IncomesListResponse>({ incomes, total });
   } catch (error) {
     return handleApiError(error, "incomes");
   }
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return apiSuccess({ income }, 201);
+    return apiSuccess<IncomeCreateResponse>({ income }, 201);
   } catch (error) {
     return handleApiError(error, "incomes");
   }

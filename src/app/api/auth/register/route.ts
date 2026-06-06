@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import type { RegisterResponse } from "@/types/api";
 import { EMAIL_REGEX } from "@/lib/utils";
 
 const MIN_PASSWORD_LENGTH = 6;
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    return apiSuccess({ user: data.user });
+    return apiSuccess<RegisterResponse>({ user: data.user });
   } catch (error) {
     return handleApiError(error, "auth/register");
   }

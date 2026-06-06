@@ -30,7 +30,7 @@ export default function GestionarTareasPage() {
       const d = await r.json();
       if (d.error) { router.push("/login"); return; }
       setTasks([...d.available, ...d.inProgress, ...d.completed]);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { console.error("[GestionarTareas]", e); } finally { setLoading(false); }
   }, [router]);
 
   useEffect(() => { refetch(); }, [refetch]);
@@ -70,14 +70,14 @@ export default function GestionarTareasPage() {
       }
       setSheetOpen(false);
       refetch();
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[GestionarTareas/save]", e); } finally { setSaving(false); }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await fetch(`/api/tasks?id=${id}`, { method: "DELETE" });
       refetch();
-    } catch {}
+    } catch (e) { console.error("[GestionarTareas/delete]", e); }
   };
 
   if (loading) return <GestionarSkeleton />;

@@ -27,7 +27,7 @@ export default function HistorialPage() {
       if (d.error) { router.push("/login"); return; }
       setGrouped(d.expenses ?? {});
       setTotal(d.total ?? 0);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { console.error("[HistorialPage]", e); } finally { setLoading(false); }
   }, [router]);
 
   useEffect(() => { refetch(); }, [refetch]);
@@ -37,7 +37,7 @@ export default function HistorialPage() {
     try {
       await fetch(`/api/expenses/${id}`, { method: "DELETE" });
       refetch();
-    } catch {} finally { setDeleting(null); }
+    } catch (e) { console.error("[HistorialPage/delete]", e); } finally { setDeleting(null); }
   };
 
   if (loading) return <HistorialSkeleton />;

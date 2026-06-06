@@ -47,7 +47,7 @@ export default function DashboardPage() {
         }
         setData(d);
       })
-      .catch(() => {})
+      .catch((e) => console.error("[DashboardPage]", e))
       .finally(() => setLoading(false));
   }, [router]);
 

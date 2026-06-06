@@ -31,10 +31,13 @@ export async function requireAuth() {
   return user;
 }
 
-export async function requirePartnerAuth() {
+export type AuthenticatedUser = NonNullable<Awaited<ReturnType<typeof requireAuth>>>;
+export type UserWithPartner = AuthenticatedUser & { partnerId: string };
+
+export async function requirePartnerAuth(): Promise<UserWithPartner> {
   const user = await requireAuth();
   if (!user.partnerId) {
     throw new AuthError("Sin pareja vinculada", 400);
   }
-  return user as typeof user & { partnerId: string };
+  return { ...user, partnerId: user.partnerId };
 }

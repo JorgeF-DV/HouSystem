@@ -2,6 +2,7 @@ import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import type { Prisma } from "@/generated/prisma/client";
+import type { MessageResponse } from "@/types/api";
 
 export async function POST() {
   try {
@@ -15,7 +16,7 @@ export async function POST() {
       await tx.partner.delete({ where: { id: partnerId } });
     });
 
-    return apiSuccess({ message: "Pareja desvinculada" });
+    return apiSuccess<MessageResponse>({ message: "Pareja desvinculada" });
   } catch (error) {
     return handleApiError(error, "partner/unlink");
   }

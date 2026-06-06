@@ -18,18 +18,20 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
+const PROGRESS_THRESHOLDS = [
+  { min: 90, color: "#FF5B5B" },
+  { min: 71, color: "#F5A623" },
+] as const;
+
 export function getProgressColor(percent: number): string {
-  if (percent >= 90) return "#FF5B5B";
-  if (percent > 70) return "#F5A623";
-  return "#00C896";
+  return PROGRESS_THRESHOLDS.find((t) => percent >= t.min)?.color ?? "#00C896";
 }
 
 export function getRouteId(url: URL): string {
   return url.pathname.split("/").pop()!;
 }
 
-export function getWeekStart(): Date {
-  const now = new Date();
+export function getWeekStart(now: Date = new Date()): Date {
   const day = now.getDay();
   const diff = now.getDate() - day + (day === 0 ? -6 : 1);
   const monday = new Date(now);

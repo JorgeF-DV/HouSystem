@@ -3,6 +3,7 @@ import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import type { Prisma } from "@/generated/prisma/client";
+import type { GoalsListResponse, GoalCreateResponse } from "@/types/api";
 
 type GoalWithContrib = Prisma.GoalGetPayload<{ include: { contributions: true } }>;
 
@@ -22,7 +23,7 @@ export async function GET() {
       contributionCount: g.contributions.length,
     }));
 
-    return apiSuccess({ goals: result });
+    return apiSuccess<GoalsListResponse>({ goals: result });
   } catch (error) {
     return handleApiError(error, "goals");
   }
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return apiSuccess({ goal }, 201);
+    return apiSuccess<GoalCreateResponse>({ goal }, 201);
   } catch (error) {
     return handleApiError(error, "goals");
   }

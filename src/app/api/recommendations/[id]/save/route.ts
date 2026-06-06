@@ -2,6 +2,7 @@ import { requirePartnerAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
 import { getRouteId } from "@/lib/utils";
+import type { EventCreateResponse } from "@/types/api";
 
 export async function POST(req: Request) {
   try {
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return apiSuccess({ event }, 201);
+    return apiSuccess<EventCreateResponse>({ event }, 201);
   } catch (error) {
     return handleApiError(error, "recommendations/save");
   }

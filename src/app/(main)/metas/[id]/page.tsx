@@ -44,7 +44,7 @@ export default function MetaDetailPage({ params }: { params: Promise<{ id: strin
       setEditPrice(String(d.price));
       setEditPlatform(d.platform);
       setEditLink(d.link ?? "");
-    } catch {} finally { setLoading(false); }
+    } catch (e) { console.error("[MetaDetail]", e); } finally { setLoading(false); }
   }, [id, router]);
 
   useEffect(() => { refetch(); }, [refetch]);
@@ -61,7 +61,7 @@ export default function MetaDetailPage({ params }: { params: Promise<{ id: strin
       });
       const d = await r.json();
       if (d.contribution) { setAmount(""); refetch(); }
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[MetaDetail/contribution]", e); } finally { setSaving(false); }
   };
 
   const updateGoal = async () => {
@@ -74,7 +74,7 @@ export default function MetaDetailPage({ params }: { params: Promise<{ id: strin
       });
       const d = await r.json();
       if (!d.error) { setEditOpen(false); refetch(); }
-    } catch {} finally { setSaving(false); }
+    } catch (e) { console.error("[MetaDetail/update]", e); } finally { setSaving(false); }
   };
 
   const deleteGoal = async () => {
