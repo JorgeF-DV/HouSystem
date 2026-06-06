@@ -5,6 +5,13 @@ export class NotFoundError extends Error {
   }
 }
 
+export class InputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InputError";
+  }
+}
+
 export async function getOwnedResource<T>(
   model: { findFirst: (args: any) => Promise<T | null> },
   id: string,

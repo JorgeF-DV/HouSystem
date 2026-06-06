@@ -1,20 +1,15 @@
 import { NextRequest } from "next/server";
 import { requirePartnerAuth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import { takeTask } from "@/lib/services/tasks-service";
 import type { MessageResponse } from "@/types/api";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requirePartnerAuth();
     const { id } = await params;
-
-    const task = await prisma.task.findFirst({ where: { id, partnerId: user.partnerId, status: "available" } });
-    if (!task) return apiError("Tarea no disponible", 404);
-
-    await prisma.task.update({ where: { id }, data: { status: "in_progress", assignedTo: user.id } });
-
-    return apiSuccess<MessageResponse>({ message: "Tarea tomada" });
+    const result = await takeTask(user.partnerId, user.id, id);
+    return apiSuccess<MessageResponse>(result);
   } catch (error) {
     return handleApiError(error, "tasks/take");
   }

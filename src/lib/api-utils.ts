@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { AuthError } from "./auth";
-import { NotFoundError } from "./db-utils";
+import { InputError, NotFoundError } from "./db-utils";
 
 export function apiError(message: string, status: number = 400) {
   return NextResponse.json({ error: message }, { status });
@@ -14,6 +14,9 @@ export function handleApiError(error: unknown, context: string) {
   console.error(`[${context}]`, error);
   if (error instanceof AuthError) {
     return apiError(error.message, error.statusCode);
+  }
+  if (error instanceof InputError) {
+    return apiError(error.message, 400);
   }
   if (error instanceof NotFoundError) {
     return apiError(error.message, 404);

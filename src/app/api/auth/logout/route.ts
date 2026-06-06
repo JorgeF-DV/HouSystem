@@ -1,13 +1,11 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { apiSuccess, apiError, handleApiError } from "@/lib/api-utils";
+import { apiSuccess, handleApiError } from "@/lib/api-utils";
+import { logout } from "@/lib/services/auth-service";
 import type { MessageResponse } from "@/types/api";
 
 export async function POST() {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.signOut();
-    if (error) return apiError(error.message);
-    return apiSuccess<MessageResponse>({ message: "Sesión cerrada" });
+    const result = await logout();
+    return apiSuccess<MessageResponse>(result);
   } catch (error) {
     return handleApiError(error, "auth/logout");
   }
