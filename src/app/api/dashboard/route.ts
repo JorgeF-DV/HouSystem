@@ -61,16 +61,18 @@ export async function GET() {
       orderBy: { date: "asc" },
     });
 
-    const monthIncomes = await prisma.income.findMany({
-      where: { partnerId: user.partnerId },
-    });
-
-    const totalIncome = monthIncomes
-      .filter((inc: { date: Date }) => {
-        const d = new Date(inc.date);
-        return d.getMonth() === month && d.getFullYear() === year;
-      })
-      .reduce((sum: number, inc: { amount: number }) => sum + inc.amount, 0);
+    let totalIncome = 0;
+    try {
+      const monthIncomes = await prisma.income.findMany({
+        where: { partnerId: user.partnerId },
+      });
+      totalIncome = monthIncomes
+        .filter((inc: { date: Date }) => {
+          const d = new Date(inc.date);
+          return d.getMonth() === month && d.getFullYear() === year;
+        })
+        .reduce((sum: number, inc: { amount: number }) => sum + inc.amount, 0);
+    } catch {}
 
     return apiSuccess({
       greeting: `Buen día, ${user.name}`,
